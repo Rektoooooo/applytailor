@@ -38,7 +38,7 @@ import { useApplications } from '../hooks/useApplications';
 import { useBaseProfile } from '../hooks/useBaseProfile';
 import { useSubscription } from '../hooks/useSubscription';
 import { CVTemplateSelector } from '../components/cv-templates';
-import { refineBullet, refineCoverLetter, purchaseEditPack, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
+import { refineBullet, refineCoverLetter, purchaseEditPack, checkRemainingEdits, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
 
 // Default empty data for when application isn't loaded yet
 const emptyApplication = {
@@ -430,7 +430,7 @@ export default function Results() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Fetch application data on mount (only if ID provided)
+  // Fetch application data and remaining edits on mount (only if ID provided)
   useEffect(() => {
     const fetchApplication = async () => {
       if (!id) {
@@ -438,9 +438,24 @@ export default function Results() {
         return;
       }
       setLoading(true);
+
+      // Reset edits to default first (in case fetch fails)
+      setFreeEditsRemaining(FREE_TIER.refinements);
+
       const result = await getApplication(id);
       if (result.data) {
         setApplication(result.data);
+
+        // Fetch actual remaining edits for this application
+        try {
+          const editsResult = await checkRemainingEdits({ applicationId: id });
+          if (editsResult?.free_tier?.remaining !== undefined) {
+            setFreeEditsRemaining(editsResult.free_tier.remaining);
+          }
+        } catch (err) {
+          // If fetch fails, keep default (5)
+          console.error('Failed to fetch remaining edits:', err);
+        }
       }
       setLoading(false);
     };

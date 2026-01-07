@@ -123,6 +123,15 @@ export async function purchaseEditPack({ applicationId }) {
   });
 }
 
+/**
+ * Check remaining edits for an application
+ */
+export async function checkRemainingEdits({ applicationId }) {
+  return callEdgeFunction('check-edits', {
+    application_id: applicationId,
+  });
+}
+
 // Credit costs for display purposes
 export const CREDIT_COSTS = {
   generation: 1.0,         // Full package
