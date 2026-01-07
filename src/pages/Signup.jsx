@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Loader2, ArrowRight, Check } from 'lucide-react';
-import { LogoIcon } from '../components/Logo';
 import { signUpWithEmail, signInWithGoogle } from '../lib/supabase';
 
 export default function Signup() {
@@ -83,9 +82,7 @@ export default function Signup() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md">
-            <LogoIcon className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="ApplyTailor" className="w-12 h-12 object-contain" />
           <span className="text-2xl font-bold text-charcoal">ApplyTailor</span>
         </Link>
 

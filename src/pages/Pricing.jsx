@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Check, ArrowRight, Loader2, Sparkles, Zap, Crown } from 'lucide-react';
-import { LogoIcon } from '../components/Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
 import { CREDIT_PACKAGES } from '../lib/stripe';
@@ -97,9 +96,7 @@ export default function Pricing() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-cream/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md">
-              <LogoIcon className="w-4 h-4 text-white" />
-            </div>
+            <img src="/logo.png" alt="ApplyTailor" className="w-10 h-10 object-contain" />
             <span className="text-xl font-bold text-charcoal">ApplyTailor</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -285,9 +282,7 @@ export default function Pricing() {
       <footer className="py-8 px-6 border-t border-slate-100">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-gradient-to-br from-teal-500 to-teal-700 rounded-lg flex items-center justify-center">
-              <LogoIcon className="w-3 h-3 text-white" />
-            </div>
+            <img src="/logo.png" alt="ApplyTailor" className="w-8 h-8 object-contain" />
             <span className="text-sm font-medium text-charcoal">ApplyTailor</span>
           </div>
           <div className="flex gap-6 text-sm text-slate-500">

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/applytailor-icon.svg" alt="ApplyTailor Logo" width="100" height="100" />
+  <img src="public/logo.png" alt="ApplyTailor Logo" width="120" height="120" />
 </p>
 
 <h1 align="center">ApplyTailor</h1>

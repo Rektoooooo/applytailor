@@ -10,7 +10,6 @@ import {
   X,
   MessageSquareReply
 } from 'lucide-react';
-import { LogoIcon } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { useBaseProfile } from '../hooks/useBaseProfile';
 import { useMobileMenu } from '../contexts/MobileMenuContext';
@@ -77,9 +76,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-[73px] px-6 flex items-center border-b border-slate-100 justify-between">
         <NavLink to="/dashboard" className="flex items-center gap-3 group" onClick={handleNavClick}>
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-            <LogoIcon className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="ApplyTailor" className="w-11 h-11 object-contain group-hover:scale-105 transition-transform" />
           <div>
             <h1 className="text-xl font-bold text-charcoal tracking-tight">ApplyTailor</h1>
             <p className="text-xs text-slate-400">Smart job applications</p>

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Loader2, ArrowLeft } from 'lucide-react';
-import { LogoIcon } from '../components/Logo';
 import { resetPassword } from '../lib/supabase';
 
 export default function ForgotPassword() {
@@ -62,9 +61,7 @@ export default function ForgotPassword() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md">
-            <LogoIcon className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="ApplyTailor" className="w-12 h-12 object-contain" />
           <span className="text-2xl font-bold text-charcoal">ApplyTailor</span>
         </Link>
 
