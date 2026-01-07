@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/generate-pdf.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/scrape-job.js": {
+      "memory": 256,
+      "maxDuration": 15
+    }
+  }
+}
