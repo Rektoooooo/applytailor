@@ -1145,7 +1145,7 @@ export default function Results() {
                 <CVTemplateSelector
                   personalInfo={{
                     name: baseProfile?.personal_info?.name || 'Your Name',
-                    title: application?.role || baseProfile?.preferences?.roles?.[0] || 'Professional',
+                    title: baseProfile?.personal_info?.title || baseProfile?.preferences?.roles?.[0] || application?.role?.replace(/[*\/\-–]/g, ' ').trim() || 'Professional',
                     email: baseProfile?.personal_info?.email || '',
                     phone: baseProfile?.personal_info?.phone || '',
                     location: baseProfile?.personal_info?.address || '',
@@ -1166,8 +1166,11 @@ export default function Results() {
                   })) || []}
                   education={(baseProfile?.education || []).map((edu) => ({
                     ...edu,
+                    degree: edu.degree || edu.field_of_study || '',
                     school: edu.school || edu.institution,
-                    year: edu.year || edu.graduation_year,
+                    year: edu.start_year && edu.graduation_year
+                      ? `${edu.start_year}-${edu.graduation_year}`
+                      : edu.year || edu.graduation_year || '',
                   }))}
                   skills={baseProfile?.skills || { languages: [], frameworks: [], tools: [] }}
                   projects={baseProfile?.projects || []}

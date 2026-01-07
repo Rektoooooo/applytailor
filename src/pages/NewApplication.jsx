@@ -298,6 +298,90 @@ export default function NewApplication() {
           )}
         </AnimatePresence>
 
+        {/* Generation Loading Overlay */}
+        <AnimatePresence>
+          {isGenerating && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-charcoal/80 backdrop-blur-sm z-50 flex items-center justify-center"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl text-center"
+              >
+                {/* Animated Icon */}
+                <div className="relative w-20 h-20 mx-auto mb-6">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 rounded-full border-4 border-teal-100 border-t-teal-500"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-teal-500" />
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-semibold text-charcoal mb-2">
+                  Generating Your Application
+                </h3>
+                <p className="text-slate-500 text-sm mb-6">
+                  AI is analyzing the job description and tailoring your CV...
+                </p>
+
+                {/* Progress Steps */}
+                <div className="space-y-3 text-left">
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-3 text-sm"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-teal-600" />
+                    </div>
+                    <span className="text-slate-600">Analyzing job requirements</span>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="flex items-center gap-3 text-sm"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center">
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      >
+                        <Loader2 className="w-4 h-4 text-teal-600 animate-spin" />
+                      </motion.div>
+                    </div>
+                    <span className="text-slate-600">Tailoring CV bullets</span>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 0.5, x: 0 }}
+                    transition={{ delay: 1.4 }}
+                    className="flex items-center gap-3 text-sm"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-slate-300 rounded-full" />
+                    </div>
+                    <span className="text-slate-400">Writing cover letter</span>
+                  </motion.div>
+                </div>
+
+                <p className="text-xs text-slate-400 mt-6">
+                  This usually takes 10-15 seconds
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Navigation */}
         <motion.div
           initial={{ opacity: 0 }}

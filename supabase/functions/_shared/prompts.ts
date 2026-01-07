@@ -63,9 +63,13 @@ Requirements:
 - WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
 
 ### Company and Job Title Extraction
-- Extract the company name from the job posting
-- Extract the exact job title from the job posting
-- If not clearly stated, make a reasonable inference
+- Extract the ACTUAL company name from the job posting (e.g., "Google", "Microsoft", "Acme Corp")
+- Look for company name after phrases like "at", "for", "join", "about us", or in headers
+- DO NOT include generic words like "kolega", "team", "we" as company name
+- If company name is unclear, look for domain names, email addresses, or brand mentions
+- Extract a CLEAN job title (e.g., "iOS Developer", "Software Engineer", "Frontend Developer")
+- Simplify verbose titles: "Vývojář*ka mobilních aplikací – iOS" → "iOS Developer"
+- Remove gender markers, special characters, and unnecessary qualifiers from titles
 
 ### Keyword Analysis
 - matched: Keywords from job posting that appear in the candidate's profile

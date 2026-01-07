@@ -186,11 +186,11 @@ const ExecutiveNavy = forwardRef(function ExecutiveNavy(
                     {job.duration}
                   </p>
                   {job.bullets?.length > 0 && (
-                    <ul className="space-y-1.5 text-sm text-slate-600">
+                    <ul className="space-y-1 text-xs text-slate-600">
                       {job.bullets.map((bullet, bulletIdx) => (
                         <li key={bulletIdx} className="flex gap-2">
-                          <span className="text-[#1e3a5f] mt-1">•</span>
-                          <span className="leading-relaxed">{bullet}</span>
+                          <span className="text-[#1e3a5f] mt-0.5">•</span>
+                          <span className="leading-snug">{bullet}</span>
                         </li>
                       ))}
                     </ul>
