@@ -11,11 +11,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Credit packages mapping
+// Credit packages mapping - Value Leader Pricing
 const CREDIT_PACKAGES: Record<string, number> = {
-  [Deno.env.get('STRIPE_STARTER_PRICE_ID') || '']: 20,
-  [Deno.env.get('STRIPE_STANDARD_PRICE_ID') || '']: 50,
-  [Deno.env.get('STRIPE_PRO_PRICE_ID') || '']: 100,
+  'price_1Sn1FyQgLWTUHkxnYesiQ5QP': 25,  // Starter
+  'price_1Sn1GHQgLWTUHkxnRN2Lu6gq': 75,  // Standard
+  'price_1Sn1GWQgLWTUHkxnOSTGV4Ga': 150, // Pro
 };
 
 serve(async (req) => {
