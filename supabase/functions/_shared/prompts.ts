@@ -58,11 +58,14 @@ Requirements:
 - 150-200 words maximum
 - WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
 
-### Professional Summary
-- 2-3 sentences tailored to this specific role
+### Professional Summary (4-5 sentences, ~80-100 words)
+- Write a comprehensive 4-5 sentence professional summary
 - Lead with years of experience and core expertise
-- Include key skills that match job requirements
+- Mention 3-4 key skills that match job requirements
+- Include a brief mention of achievements or impact
+- End with career goals or what you bring to the role
 - WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
+- This should be substantial enough to fill the profile section of a CV
 
 ### Company and Job Title Extraction
 - Extract the ACTUAL company name from the job posting (e.g., "Google", "Microsoft", "Acme Corp")
