@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-const STORAGE_KEY = 'applytailor_notifications';
 const DISMISSED_KEY = 'applytailor_dismissed_notifications';
+const READ_KEY = 'applytailor_read_notifications';
 
 // Notification types and their icons
 export const NOTIFICATION_TYPES = {
@@ -13,9 +13,8 @@ export const NOTIFICATION_TYPES = {
 };
 
 // Generate dynamic notifications based on user state
-function generateDynamicNotifications(profile, dismissedIds) {
+function generateDynamicNotifications(profile, dismissedIds, readIds) {
   const notifications = [];
-  const now = new Date();
 
   // Welcome notification - only show once
   if (!dismissedIds.includes('welcome')) {
@@ -25,7 +24,7 @@ function generateDynamicNotifications(profile, dismissedIds) {
       title: 'Welcome to ApplyTailor!',
       message: 'Start by building your Base Profile to get personalized CVs.',
       time: 'Just now',
-      read: false,
+      read: readIds.includes('welcome'),
       link: '/dashboard/profile',
     });
   }
@@ -40,7 +39,7 @@ function generateDynamicNotifications(profile, dismissedIds) {
         title: 'Running low on credits',
         message: `You have ${credits.toFixed(2)} credits remaining. Top up to continue generating CVs.`,
         time: 'Now',
-        read: false,
+        read: readIds.includes('low_credits'),
         link: '/dashboard/topup',
       });
     }
@@ -53,7 +52,7 @@ function generateDynamicNotifications(profile, dismissedIds) {
         title: 'Out of credits',
         message: 'Top up your credits to generate tailored CVs and cover letters.',
         time: 'Now',
-        read: false,
+        read: readIds.includes('no_credits'),
         link: '/dashboard/topup',
       });
     }
@@ -67,7 +66,7 @@ function generateDynamicNotifications(profile, dismissedIds) {
         title: 'Complete your profile',
         message: 'Add your details to generate better tailored applications.',
         time: 'Tip',
-        read: false,
+        read: readIds.includes('incomplete_profile'),
         link: '/dashboard/profile',
       });
     }
@@ -80,7 +79,7 @@ function generateDynamicNotifications(profile, dismissedIds) {
         title: 'Ready to apply?',
         message: 'Paste a job description to generate a tailored CV instantly.',
         time: 'Tip',
-        read: false,
+        read: readIds.includes('first_app_tip'),
         link: '/dashboard/new',
       });
     }
@@ -93,7 +92,7 @@ function generateDynamicNotifications(profile, dismissedIds) {
         title: 'New: Smart Reply',
         message: 'Generate professional responses to recruiter emails with AI.',
         time: 'New feature',
-        read: false,
+        read: readIds.includes('smart_reply_tip'),
         link: '/smart-reply',
       });
     }
@@ -106,24 +105,29 @@ export function useNotifications() {
   const { profile } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [dismissedIds, setDismissedIds] = useState([]);
+  const [readIds, setReadIds] = useState([]);
 
-  // Load dismissed IDs from localStorage on mount
+  // Load dismissed and read IDs from localStorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(DISMISSED_KEY);
-      if (stored) {
-        setDismissedIds(JSON.parse(stored));
+      const storedDismissed = localStorage.getItem(DISMISSED_KEY);
+      if (storedDismissed) {
+        setDismissedIds(JSON.parse(storedDismissed));
+      }
+      const storedRead = localStorage.getItem(READ_KEY);
+      if (storedRead) {
+        setReadIds(JSON.parse(storedRead));
       }
     } catch (e) {
-      console.error('Error loading dismissed notifications:', e);
+      console.error('Error loading notification state:', e);
     }
   }, []);
 
-  // Generate notifications when profile or dismissedIds change
+  // Generate notifications when profile, dismissedIds, or readIds change
   useEffect(() => {
-    const dynamicNotifications = generateDynamicNotifications(profile, dismissedIds);
+    const dynamicNotifications = generateDynamicNotifications(profile, dismissedIds, readIds);
     setNotifications(dynamicNotifications);
-  }, [profile, dismissedIds]);
+  }, [profile, dismissedIds, readIds]);
 
   // Dismiss a notification (permanently)
   const dismissNotification = useCallback((id) => {
@@ -139,25 +143,43 @@ export function useNotifications() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Mark all as read (just removes unread styling, doesn't dismiss)
+  // Mark all as read (persists to localStorage)
   const markAllRead = useCallback(() => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  }, []);
+    const allIds = notifications.map((n) => n.id);
+    setReadIds((prev) => {
+      const newReadIds = [...new Set([...prev, ...allIds])];
+      try {
+        localStorage.setItem(READ_KEY, JSON.stringify(newReadIds));
+      } catch (e) {
+        console.error('Error saving read notifications:', e);
+      }
+      return newReadIds;
+    });
+  }, [notifications]);
 
-  // Mark single notification as read
+  // Mark single notification as read (persists to localStorage)
   const markAsRead = useCallback((id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    setReadIds((prev) => {
+      if (prev.includes(id)) return prev;
+      const newReadIds = [...prev, id];
+      try {
+        localStorage.setItem(READ_KEY, JSON.stringify(newReadIds));
+      } catch (e) {
+        console.error('Error saving read notifications:', e);
+      }
+      return newReadIds;
+    });
   }, []);
 
   // Get unread count
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Reset all dismissed notifications (for testing)
-  const resetDismissed = useCallback(() => {
+  // Reset all notification state (for testing)
+  const resetNotifications = useCallback(() => {
     localStorage.removeItem(DISMISSED_KEY);
+    localStorage.removeItem(READ_KEY);
     setDismissedIds([]);
+    setReadIds([]);
   }, []);
 
   return {
@@ -166,6 +188,6 @@ export function useNotifications() {
     dismissNotification,
     markAllRead,
     markAsRead,
-    resetDismissed,
+    resetNotifications,
   };
 }
