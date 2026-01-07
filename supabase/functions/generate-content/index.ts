@@ -1,7 +1,6 @@
 // Main CV/Cover Letter generation endpoint
 // Cost: 1 credit per generation
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { callClaude, parseJsonResponse } from '../_shared/claude.ts';
 import { MAIN_GENERATION_PROMPT, CV_ONLY_PROMPT, COVER_LETTER_ONLY_PROMPT, buildGenerationPrompt } from '../_shared/prompts.ts';
 import {
@@ -55,7 +54,7 @@ interface GenerationResponse {
   match_score: number;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

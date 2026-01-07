@@ -1,7 +1,6 @@
 // Cover letter refinement endpoint
 // Cost: 0.25 credits for shorter, 0.5 credits for regenerate
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { callClaude } from '../_shared/claude.ts';
 import { COVER_LETTER_REFINEMENT_PROMPTS, buildCoverLetterRefinementContext } from '../_shared/prompts.ts';
 import {
@@ -28,7 +27,7 @@ interface RefineCoverLetterRequest {
   candidate_name?: string;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

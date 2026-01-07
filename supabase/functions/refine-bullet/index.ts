@@ -1,7 +1,6 @@
 // Bullet point refinement endpoint
 // Cost: 0.25 credits per refinement
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { callClaude } from '../_shared/claude.ts';
 import { BULLET_REFINEMENT_PROMPTS, buildBulletRefinementContext } from '../_shared/prompts.ts';
 import {
@@ -27,7 +26,7 @@ interface RefineBulletRequest {
   job_context?: string; // Optional job description for context
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

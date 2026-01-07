@@ -1,9 +1,7 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import Stripe from 'https://esm.sh/stripe@13.6.0?target=deno';
+import Stripe from 'npm:stripe@13.6.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
   apiVersion: '2023-10-16',
-  httpClient: Stripe.createFetchHttpClient(),
 });
 
 const corsHeaders = {
@@ -18,7 +16,7 @@ const CREDIT_PACKAGES: Record<string, number> = {
   'price_1Sn1GWQgLWTUHkxnOSTGV4Ga': 150, // Pro
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

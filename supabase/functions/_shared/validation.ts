@@ -1,6 +1,6 @@
 // Input validation, rate limiting, and security utilities
 
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2.38.4';
 
 // Rate limits configuration
 const RATE_LIMITS = {
