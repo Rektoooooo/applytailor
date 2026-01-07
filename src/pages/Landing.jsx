@@ -953,29 +953,28 @@ export default function Landing() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-gradient-to-br from-charcoal to-slate-800 rounded-3xl p-12 text-center relative overflow-hidden"
+            className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl p-12 text-center relative overflow-hidden border border-teal-100"
           >
             {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-teal-200/30 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-200/30 rounded-full blur-3xl" />
 
-            
             <div className="relative z-10">
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl lg:text-4xl font-bold text-charcoal mb-4">
                 Ready to land more interviews?
               </h2>
-              <p className="text-lg text-slate-300 mb-8 max-w-xl mx-auto">
+              <p className="text-lg text-slate-600 mb-8 max-w-xl mx-auto">
                 Join thousands of job seekers who've transformed their job search with ApplyTailor.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   to="/signup"
-                  className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-xl hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-500/25 flex items-center gap-2"
+                  className="px-8 py-4 bg-gradient-to-r from-teal-600 to-teal-700 text-white font-medium rounded-xl hover:from-teal-700 hover:to-teal-800 transition-all shadow-lg shadow-teal-500/25 flex items-center gap-2"
                 >
                   Get started for free
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <div className="text-slate-400 text-sm">
+                <div className="text-slate-500 text-sm">
                   No credit card required
                 </div>
               </div>
