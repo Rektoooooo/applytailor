@@ -36,7 +36,10 @@ async function callEdgeFunction(functionName, body) {
   if (!response.ok) {
     // Handle specific error codes
     if (response.status === 401) {
-      throw new Error('Session expired. Please sign in again.');
+      // Show actual server error for debugging
+      const serverError = data.error || 'Unknown auth error';
+      console.error('Auth error from server:', serverError);
+      throw new Error(`Session expired: ${serverError}`);
     }
     if (response.status === 402) {
       throw new Error(data.error || 'Insufficient credits. Please top up to continue.');
