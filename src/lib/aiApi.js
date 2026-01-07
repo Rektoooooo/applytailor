@@ -37,8 +37,8 @@ async function callEdgeFunction(functionName, body) {
     // Handle specific error codes
     if (response.status === 401) {
       // Show actual server error for debugging
-      const serverError = data.error || 'Unknown auth error';
-      console.error('Auth error from server:', serverError);
+      console.error('Full 401 response:', JSON.stringify(data));
+      const serverError = data.error || data.message || data.msg || JSON.stringify(data);
       throw new Error(`Session expired: ${serverError}`);
     }
     if (response.status === 402) {
