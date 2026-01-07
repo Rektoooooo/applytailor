@@ -15,14 +15,14 @@ import { useBaseProfile } from '../hooks/useBaseProfile';
 import { signOut } from '../lib/supabase';
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/profile', icon: User, label: 'Base Profile' },
-  { to: '/new', icon: PlusCircle, label: 'New Application' },
-  { to: '/results', icon: FileText, label: 'Applications' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/dashboard/profile', icon: User, label: 'Base Profile' },
+  { to: '/dashboard/new', icon: PlusCircle, label: 'New Application' },
+  { to: '/dashboard/results', icon: FileText, label: 'Applications' },
 ];
 
 const bottomItems = [
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Sidebar() {
@@ -60,7 +60,7 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-100 flex flex-col z-40">
       {/* Logo */}
       <div className="h-[73px] px-6 flex items-center border-b border-slate-100">
-        <NavLink to="/" className="flex items-center gap-3 group">
+        <NavLink to="/dashboard" className="flex items-center gap-3 group">
           <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
             <LogoIcon className="w-5 h-5 text-white" />
           </div>
@@ -101,7 +101,7 @@ export default function Sidebar() {
       {/* Credits Display */}
       <div className="px-4 mb-2">
         <NavLink
-          to="/topup"
+          to="/dashboard/topup"
           className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-teal-50 to-teal-100 text-teal-700 rounded-lg hover:from-teal-100 hover:to-teal-200 transition-all"
         >
           <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function Sidebar() {
 
       {/* User Profile */}
       <div className="p-4 border-t border-slate-100">
-        <NavLink to="/settings" className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
+        <NavLink to="/dashboard/settings" className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center overflow-hidden">
             {photoUrl ? (
               <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />

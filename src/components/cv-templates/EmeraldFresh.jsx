@@ -208,6 +208,7 @@ const EmeraldFresh = forwardRef(function EmeraldFresh(
               </div>
             </section>
           )}
+        </div>
       </div>
     </div>
   );

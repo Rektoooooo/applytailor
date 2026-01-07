@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 
 // Layouts
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import RootRedirect from './components/RootRedirect';
 
 // Public pages
 import Landing from './pages/Landing';
@@ -54,6 +55,9 @@ function App() {
       />
       <Router>
         <Routes>
+          {/* Root - shows Landing or redirects to Dashboard based on auth */}
+          <Route path="/" element={<RootRedirect />} />
+
           {/* Public routes */}
           <Route path="/landing" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -64,9 +68,9 @@ function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
 
-          {/* Protected routes */}
+          {/* Protected routes - under /dashboard */}
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Layout />
@@ -82,6 +86,9 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="topup" element={<TopUp />} />
           </Route>
+
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

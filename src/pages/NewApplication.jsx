@@ -181,7 +181,7 @@ export default function NewApplication() {
       refreshProfile?.();
 
       // 7. Navigate to results page
-      navigate(`/results/${app.id}`);
+      navigate(`/dashboard/results/${app.id}`);
     } catch (err) {
       setError(err.message || 'Failed to generate application. Please try again.');
       setIsGenerating(false);

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [status, setStatus] = useState('loading');
   const [message, setMessage] = useState('');
 
@@ -21,7 +22,7 @@ export default function AuthCallback() {
           setStatus('success');
           setMessage('Redirecting to reset your password...');
           setTimeout(() => {
-            window.location.href = '/settings?tab=security&reset=true';
+            window.location.href = '/dashboard/settings?tab=security&reset=true';
           }, 1500);
           return;
         }
@@ -45,7 +46,7 @@ export default function AuthCallback() {
               setMessage('Successfully signed in! Redirecting...');
               // Use hard redirect to ensure clean state
               setTimeout(() => {
-                window.location.href = '/';
+                window.location.href = '/dashboard';
               }, 1000);
             }
             return;
@@ -58,7 +59,7 @@ export default function AuthCallback() {
           setStatus('success');
           setMessage('Successfully signed in! Redirecting...');
           setTimeout(() => {
-            window.location.href = '/';
+            window.location.href = '/dashboard';
           }, 1000);
           return;
         }

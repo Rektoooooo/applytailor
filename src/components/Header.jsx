@@ -171,7 +171,7 @@ export default function Header({ title, subtitle }) {
           </div>
 
           {/* Credits Display */}
-          <Link to="/topup">
+          <Link to="/dashboard/topup">
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

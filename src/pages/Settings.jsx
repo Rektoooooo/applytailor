@@ -202,7 +202,7 @@ function CreditsTab() {
 
         {/* Top Up Button */}
         <button
-          onClick={() => navigate('/topup')}
+          onClick={() => navigate('/dashboard/topup')}
           className="btn-primary w-full"
         >
           <Plus className="w-4 h-4" />
@@ -257,7 +257,7 @@ function CreditsTab() {
                 You need credits to generate tailored CVs. Top up now to continue.
               </p>
               <button
-                onClick={() => navigate('/topup')}
+                onClick={() => navigate('/dashboard/topup')}
                 className="mt-3 text-sm font-medium text-red-700 hover:text-red-800 flex items-center gap-1"
               >
                 Get more credits

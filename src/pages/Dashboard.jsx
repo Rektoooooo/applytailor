@@ -98,7 +98,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-stretch">
           {/* New Application Card */}
           <motion.div variants={itemVariants} className="h-full">
-            <Link to="/new" className="block group h-full">
+            <Link to="/dashboard/new" className="block group h-full">
               <div className="bg-white rounded-2xl border border-slate-100 p-6 h-full shadow-sm hover:shadow-md hover:border-slate-200 transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
@@ -118,7 +118,7 @@ export default function Dashboard() {
 
           {/* Base Profile Card */}
           <motion.div variants={itemVariants} className="h-full">
-            <Link to="/profile" className="block group h-full">
+            <Link to="/dashboard/profile" className="block group h-full">
               <div className="bg-white rounded-2xl border border-slate-100 p-6 h-full shadow-sm hover:shadow-md hover:border-slate-200 transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-slate-500 to-slate-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
@@ -185,7 +185,7 @@ export default function Dashboard() {
                 </span>
               )}
             </h2>
-            <Link to="/results" className="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
+            <Link to="/dashboard/results" className="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
               View all <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -205,7 +205,7 @@ export default function Dashboard() {
                   transition={{ delay: 0.3 + index * 0.05 }}
                 >
                   <Link
-                    to={`/results/${app.id}`}
+                    to={`/dashboard/results/${app.id}`}
                     className="flex items-center justify-between p-4 hover:bg-warm-gray transition-colors group"
                   >
                     <div className="flex items-center gap-4">
@@ -251,7 +251,7 @@ export default function Dashboard() {
                 <p className="text-sm text-slate-400 mt-1">
                   Create your first application to get started
                 </p>
-                <Link to="/new" className="btn-primary mt-4 inline-flex">
+                <Link to="/dashboard/new" className="btn-primary mt-4 inline-flex">
                   <PlusCircle className="w-4 h-4" />
                   Create Application
                 </Link>

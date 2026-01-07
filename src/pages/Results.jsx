@@ -167,7 +167,7 @@ function ApplicationsList({ applications, loading, searchQuery, setSearchQuery, 
           </div>
 
           {/* New Application Button */}
-          <Link to="/new" className="btn-primary">
+          <Link to="/dashboard/new" className="btn-primary">
             <PlusCircle className="w-4 h-4" />
             New Application
           </Link>
@@ -185,7 +185,7 @@ function ApplicationsList({ applications, loading, searchQuery, setSearchQuery, 
               <>
                 <h3 className="text-lg font-semibold text-charcoal mb-2">No applications yet</h3>
                 <p className="text-slate-500 mb-6">Create your first tailored application to get started</p>
-                <Link to="/new" className="btn-primary inline-flex">
+                <Link to="/dashboard/new" className="btn-primary inline-flex">
                   <PlusCircle className="w-4 h-4" />
                   Create Application
                 </Link>
@@ -620,7 +620,7 @@ export default function Results() {
           <p className="text-sm text-slate-400 mt-1">
             The application you're looking for doesn't exist or has been deleted.
           </p>
-          <Link to="/" className="btn-primary mt-4 inline-flex">
+          <Link to="/dashboard" className="btn-primary mt-4 inline-flex">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
