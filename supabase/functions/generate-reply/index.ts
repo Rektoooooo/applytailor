@@ -108,7 +108,14 @@ Deno.serve(async (req) => {
   }
 
   // Verify authentication
-  const authResult = await verifyAuth(req);
+  let authResult;
+  try {
+    authResult = await verifyAuth(req);
+  } catch (authError) {
+    console.error('Auth exception:', authError);
+    return errorResponse(`Auth crashed: ${authError.message}`, 401);
+  }
+
   if ('error' in authResult) {
     console.error('Auth failed:', authResult.error);
     return errorResponse(authResult.error, 401);
