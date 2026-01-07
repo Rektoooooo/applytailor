@@ -25,9 +25,11 @@ Deno.serve(async (req) => {
   // Verify authentication
   const authResult = await verifyAuth(req);
   if ('error' in authResult) {
+    console.error('Auth failed:', authResult.error);
     return errorResponse(authResult.error, 401);
   }
   const { userId } = authResult;
+  console.log('Auth success for user:', userId);
 
   // Get free tier status
   const freeTierStatus = await checkSmartReplyFreeTier(userId);

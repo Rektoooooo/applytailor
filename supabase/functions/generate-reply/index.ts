@@ -110,9 +110,11 @@ Deno.serve(async (req) => {
   // Verify authentication
   const authResult = await verifyAuth(req);
   if ('error' in authResult) {
+    console.error('Auth failed:', authResult.error);
     return errorResponse(authResult.error, 401);
   }
   const { userId } = authResult;
+  console.log('Auth success for user:', userId);
 
   // Check rate limit
   const rateLimitResult = await checkRateLimit(userId, 'refinement');
