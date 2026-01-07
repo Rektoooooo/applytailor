@@ -1154,16 +1154,31 @@ export default function Results() {
                     photo: baseProfile?.personal_info?.photo_url || ''
                   }}
                   summary={application?.professional_summary || generateSummary(application?.role, baseProfile, keywords)}
-                  experience={baseProfile?.work_experience?.map((exp) => ({
-                    id: exp.id,
-                    position: exp.position,
-                    company: exp.company,
-                    duration: exp.duration,
-                    bullets: bullets
+                  experience={baseProfile?.work_experience?.map((exp, expIndex) => {
+                    // Get accepted tailored bullets
+                    const tailoredBullets = bullets
                       .filter((b) => b.accepted !== false)
-                      .map((b) => b.after || b.text)
-                      .slice(0, 4) || exp.bullets,
-                  })) || []}
+                      .map((b) => b.after || b.text);
+
+                    // For first experience: show tailored bullets + some original
+                    // For other experiences: show original bullets
+                    let expBullets;
+                    if (expIndex === 0 && tailoredBullets.length > 0) {
+                      // First job gets all tailored bullets
+                      expBullets = tailoredBullets;
+                    } else {
+                      // Other jobs keep their original bullets
+                      expBullets = exp.bullets || [];
+                    }
+
+                    return {
+                      id: exp.id,
+                      position: exp.position,
+                      company: exp.company,
+                      duration: exp.duration,
+                      bullets: expBullets.slice(0, 5), // Show up to 5 bullets per job
+                    };
+                  }) || []}
                   education={(baseProfile?.education || []).map((edu) => ({
                     ...edu,
                     degree: edu.degree || edu.field_of_study || '',

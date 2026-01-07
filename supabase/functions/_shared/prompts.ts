@@ -33,13 +33,15 @@ You must respond with valid JSON in this exact structure:
 
 ## Guidelines
 
-### Tailored Bullets (Select 5 most relevant)
-- Pick the 5 experience bullets from their profile that are MOST relevant to this job
+### Tailored Bullets (MUST generate 5-6 bullets)
+- Generate 5-6 tailored bullet points based on the candidate's experience
+- If the profile has fewer bullets, CREATE additional relevant bullets based on their skills and job titles
 - Rewrite each to mirror keywords and phrases from the job description
-- Preserve all factual information and achievements
+- Preserve factual information where available, infer reasonable achievements for new bullets
 - Add quantifiable metrics where appropriate (realistic numbers)
 - Keep each bullet under 25 words
 - WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
+- IMPORTANT: Always return at least 5 bullets, never fewer
 
 ### Cover Letter
 FORMAT EXACTLY LIKE THIS with line breaks (\\n):
