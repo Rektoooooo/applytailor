@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 
 const CoralAccent = forwardRef(function CoralAccent(
   { personalInfo, summary, experience, education, skills, projects },
@@ -54,6 +54,22 @@ const CoralAccent = forwardRef(function CoralAccent(
                   <MapPin className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-white/80">{personalInfo.location}</span>
+              </div>
+            )}
+            {personalInfo?.linkedin && (
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#e17055] flex items-center justify-center flex-shrink-0">
+                  <Linkedin className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-white/80 break-all text-xs">{personalInfo.linkedin}</span>
+              </div>
+            )}
+            {personalInfo?.portfolio && (
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#e17055] flex items-center justify-center flex-shrink-0">
+                  <Globe className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-white/80 break-all text-xs">{personalInfo.portfolio}</span>
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 
 const SlateProfessional = forwardRef(function SlateProfessional(
   { personalInfo, summary, experience, education, skills, projects },
@@ -47,6 +47,12 @@ const SlateProfessional = forwardRef(function SlateProfessional(
             <div className="flex items-center gap-1.5">
               <Linkedin className="w-4 h-4 text-slate-400" />
               <span>{personalInfo.linkedin}</span>
+            </div>
+          )}
+          {personalInfo?.portfolio && (
+            <div className="flex items-center gap-1.5">
+              <Globe className="w-4 h-4 text-slate-400" />
+              <span>{personalInfo.portfolio}</span>
             </div>
           )}
         </div>

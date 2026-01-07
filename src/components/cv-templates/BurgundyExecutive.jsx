@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 
 const BurgundyExecutive = forwardRef(function BurgundyExecutive(
   { personalInfo, summary, experience, education, skills, projects },
@@ -24,23 +24,35 @@ const BurgundyExecutive = forwardRef(function BurgundyExecutive(
         </p>
 
         {/* Contact Row */}
-        <div className="flex justify-center flex-wrap gap-x-6 gap-y-2 mt-4 text-sm text-white/80">
+        <div className="flex justify-center flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-white/80">
           {personalInfo?.email && (
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-[#d4a574]" />
+            <div className="flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-[#d4a574]" />
               <span>{personalInfo.email}</span>
             </div>
           )}
           {personalInfo?.phone && (
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-[#d4a574]" />
+            <div className="flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-[#d4a574]" />
               <span>{personalInfo.phone}</span>
             </div>
           )}
           {personalInfo?.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#d4a574]" />
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#d4a574]" />
               <span>{personalInfo.location}</span>
+            </div>
+          )}
+          {personalInfo?.linkedin && (
+            <div className="flex items-center gap-1.5">
+              <Linkedin className="w-3.5 h-3.5 text-[#d4a574]" />
+              <span>{personalInfo.linkedin}</span>
+            </div>
+          )}
+          {personalInfo?.portfolio && (
+            <div className="flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-[#d4a574]" />
+              <span>{personalInfo.portfolio}</span>
             </div>
           )}
         </div>
@@ -200,12 +212,6 @@ const BurgundyExecutive = forwardRef(function BurgundyExecutive(
         )}
       </div>
 
-      {/* Burgundy Footer */}
-      <div className="mt-auto px-8 py-4 bg-[#722f37]/5 border-t border-[#722f37]/10">
-        <p className="text-center text-xs text-[#722f37]/60">
-          {personalInfo?.linkedin && `LinkedIn: ${personalInfo.linkedin}`}
-        </p>
-      </div>
     </div>
   );
 });

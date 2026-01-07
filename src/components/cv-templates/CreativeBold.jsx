@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 
 const CreativeBold = forwardRef(function CreativeBold(
   { personalInfo, summary, experience, education, skills, projects },
@@ -91,6 +91,12 @@ const CreativeBold = forwardRef(function CreativeBold(
                   <span className="break-all">{personalInfo.linkedin}</span>
                 </div>
               )}
+              {personalInfo?.portfolio && (
+                <div className="flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5 text-[#ff6b6b]" />
+                  <span className="break-all">{personalInfo.portfolio}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -146,23 +152,23 @@ const CreativeBold = forwardRef(function CreativeBold(
 
         {/* Skills Section */}
         {hasSkills && (
-          <section className="mb-6">
-            <div className="flex items-center gap-3 mb-4">
+          <section className="mb-4">
+            <div className="flex items-center gap-3 mb-2">
               <h2
                 className="text-[#1c1c1c] tracking-[0.15em]"
-                style={{ fontFamily: '"Bebas Neue", Impact, sans-serif', fontSize: '20px' }}
+                style={{ fontFamily: '"Bebas Neue", Impact, sans-serif', fontSize: '18px' }}
               >
                 SKILLS
               </h2>
               <div className="flex-1 h-0.5 bg-gradient-to-r from-[#ff6b6b] to-transparent" />
             </div>
-            <div className="space-y-3">
+            <div className="flex flex-wrap gap-4">
               {languages.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold text-[#1c1c1c]/50 uppercase tracking-[0.15em] mb-1.5">Languages</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[9px] font-bold text-[#1c1c1c]/50 uppercase tracking-[0.1em] mb-1">Languages</p>
+                  <div className="flex flex-wrap gap-1">
                     {languages.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1 bg-[#1c1c1c] text-white text-xs font-medium">
+                      <span key={idx} className="px-2 py-0.5 bg-[#1c1c1c] text-white text-[10px] font-medium">
                         {skill}
                       </span>
                     ))}
@@ -171,10 +177,10 @@ const CreativeBold = forwardRef(function CreativeBold(
               )}
               {frameworks.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold text-[#1c1c1c]/50 uppercase tracking-[0.15em] mb-1.5">Frameworks</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[9px] font-bold text-[#1c1c1c]/50 uppercase tracking-[0.1em] mb-1">Frameworks</p>
+                  <div className="flex flex-wrap gap-1">
                     {frameworks.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1 bg-[#ff6b6b] text-white text-xs font-medium">
+                      <span key={idx} className="px-2 py-0.5 bg-[#ff6b6b] text-white text-[10px] font-medium">
                         {skill}
                       </span>
                     ))}
@@ -183,10 +189,10 @@ const CreativeBold = forwardRef(function CreativeBold(
               )}
               {tools.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold text-[#1c1c1c]/50 uppercase tracking-[0.15em] mb-1.5">Tools</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[9px] font-bold text-[#1c1c1c]/50 uppercase tracking-[0.1em] mb-1">Tools</p>
+                  <div className="flex flex-wrap gap-1">
                     {tools.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1 bg-[#1c1c1c] text-white text-xs font-medium">
+                      <span key={idx} className="px-2 py-0.5 bg-[#1c1c1c] text-white text-[10px] font-medium">
                         {skill}
                       </span>
                     ))}

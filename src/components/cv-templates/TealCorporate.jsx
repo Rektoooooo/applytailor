@@ -67,6 +67,12 @@ const TealCorporate = forwardRef(function TealCorporate(
                   <span className="text-slate-600">{personalInfo.location}</span>
                 </div>
               )}
+              {personalInfo?.portfolio && (
+                <div className="flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-[#2c8c99]" />
+                  <span className="text-slate-600 break-all text-xs">{personalInfo.portfolio}</span>
+                </div>
+              )}
             </div>
           </section>
 

@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Mail, Phone, MapPin, Linkedin, Circle } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 
 const EmeraldFresh = forwardRef(function EmeraldFresh(
   { personalInfo, summary, experience, education, skills, projects },
@@ -53,6 +53,12 @@ const EmeraldFresh = forwardRef(function EmeraldFresh(
               <div className="flex items-center justify-end gap-2">
                 <span className="text-xs">{personalInfo.linkedin}</span>
                 <Linkedin className="w-4 h-4 text-emerald-500" />
+              </div>
+            )}
+            {personalInfo?.portfolio && (
+              <div className="flex items-center justify-end gap-2">
+                <span className="text-xs">{personalInfo.portfolio}</span>
+                <Globe className="w-4 h-4 text-emerald-500" />
               </div>
             )}
           </div>

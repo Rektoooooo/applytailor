@@ -64,6 +64,12 @@ const ClassicProfessional = forwardRef(function ClassicProfessional(
                   <span className="break-all text-xs">{personalInfo.linkedin}</span>
                 </div>
               )}
+              {personalInfo?.portfolio && (
+                <div className="flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5 text-[#b8860b]" />
+                  <span className="break-all text-xs">{personalInfo.portfolio}</span>
+                </div>
+              )}
             </div>
           </div>
 

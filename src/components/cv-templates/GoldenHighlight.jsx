@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 
 const GoldenHighlight = forwardRef(function GoldenHighlight(
   { personalInfo, summary, experience, education, skills, projects },
@@ -161,6 +161,12 @@ const GoldenHighlight = forwardRef(function GoldenHighlight(
               <div className="flex items-center gap-1">
                 <Linkedin className="w-3 h-3 text-[#f1c40f]" />
                 <span>{personalInfo.linkedin}</span>
+              </div>
+            )}
+            {personalInfo?.portfolio && (
+              <div className="flex items-center gap-1">
+                <Globe className="w-3 h-3 text-[#f1c40f]" />
+                <span>{personalInfo.portfolio}</span>
               </div>
             )}
           </div>

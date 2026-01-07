@@ -23,38 +23,44 @@ const ModernMinimal = forwardRef(function ModernMinimal(
         </p>
 
         {/* Contact Row */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#64748b]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#64748b]">
           {personalInfo?.email && (
             <span>{personalInfo.email}</span>
           )}
-          {personalInfo?.email && personalInfo?.phone && (
-            <span className="text-[#0d9488]">•</span>
-          )}
           {personalInfo?.phone && (
-            <span>{personalInfo.phone}</span>
-          )}
-          {(personalInfo?.email || personalInfo?.phone) && personalInfo?.location && (
-            <span className="text-[#0d9488]">•</span>
+            <>
+              <span className="text-[#0d9488]">•</span>
+              <span>{personalInfo.phone}</span>
+            </>
           )}
           {personalInfo?.location && (
-            <span>{personalInfo.location}</span>
-          )}
-          {(personalInfo?.email || personalInfo?.phone || personalInfo?.location) && personalInfo?.linkedin && (
-            <span className="text-[#0d9488]">•</span>
+            <>
+              <span className="text-[#0d9488]">•</span>
+              <span>{personalInfo.location}</span>
+            </>
           )}
           {personalInfo?.linkedin && (
-            <span>{personalInfo.linkedin}</span>
+            <>
+              <span className="text-[#0d9488]">•</span>
+              <span>{personalInfo.linkedin}</span>
+            </>
+          )}
+          {personalInfo?.portfolio && (
+            <>
+              <span className="text-[#0d9488]">•</span>
+              <span>{personalInfo.portfolio}</span>
+            </>
           )}
         </div>
       </header>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-[#0d9488] via-[#0d9488]/50 to-transparent mb-8" />
+      <div className="h-px bg-gradient-to-r from-[#0d9488] via-[#0d9488]/50 to-transparent mb-5" />
 
       {/* Summary */}
       {summary && (
-        <section className="mb-8">
-          <p className="text-[#334155] leading-relaxed">
+        <section className="mb-5">
+          <p className="text-[#334155] leading-snug text-sm">
             {summary}
           </p>
         </section>
@@ -62,30 +68,30 @@ const ModernMinimal = forwardRef(function ModernMinimal(
 
       {/* Experience */}
       {experience?.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-4">
+        <section className="mb-5">
+          <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-3">
             Experience
           </h2>
-          <div className="space-y-5">
+          <div className="space-y-3">
             {experience.map((job, idx) => (
               <div key={job.id || idx}>
                 <div className="flex justify-between items-baseline mb-0.5">
-                  <h3 className="font-semibold text-[#0f172a]">
+                  <h3 className="font-semibold text-[#0f172a] text-sm">
                     {job.company}
                   </h3>
-                  <span className="text-sm text-[#94a3b8]">
+                  <span className="text-xs text-[#94a3b8]">
                     {job.duration}
                   </span>
                 </div>
-                <p className="text-[#0d9488] text-sm font-medium mb-2">
+                <p className="text-[#0d9488] text-xs font-medium mb-1">
                   {job.position}
                 </p>
                 {job.bullets?.length > 0 && (
-                  <ul className="space-y-1.5 text-sm text-[#475569]">
+                  <ul className="space-y-0.5 text-xs text-[#475569]">
                     {job.bullets.map((bullet, bulletIdx) => (
-                      <li key={bulletIdx} className="flex gap-3">
+                      <li key={bulletIdx} className="flex gap-2">
                         <span className="text-[#0d9488] select-none">•</span>
-                        <span className="leading-relaxed">{bullet}</span>
+                        <span className="leading-snug">{bullet}</span>
                       </li>
                     ))}
                   </ul>
@@ -98,30 +104,30 @@ const ModernMinimal = forwardRef(function ModernMinimal(
 
       {/* Divider */}
       {(experience?.length > 0 && (projects?.length > 0 || education?.length > 0 || hasSkills)) && (
-        <div className="h-px bg-[#e2e8f0] mb-8" />
+        <div className="h-px bg-[#e2e8f0] mb-5" />
       )}
 
       {/* Projects */}
       {projects?.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-4">
+        <section className="mb-5">
+          <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-2">
             Projects
           </h2>
-          <div className="space-y-4">
-            {projects.slice(0, 3).map((project, idx) => (
+          <div className="space-y-2">
+            {projects.slice(0, 2).map((project, idx) => (
               <div key={project.id || idx}>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <h3 className="font-semibold text-[#0f172a]">
+                <div className="flex items-baseline gap-2">
+                  <h3 className="font-semibold text-[#0f172a] text-sm">
                     {project.name}
                   </h3>
                   {project.technologies?.length > 0 && (
-                    <span className="text-xs text-[#94a3b8]">
+                    <span className="text-[10px] text-[#94a3b8]">
                       {project.technologies.slice(0, 3).join(', ')}
                     </span>
                   )}
                 </div>
                 {project.description && (
-                  <p className="text-sm text-[#475569] leading-relaxed">
+                  <p className="text-xs text-[#475569] leading-snug">
                     {project.description}
                   </p>
                 )}
@@ -132,23 +138,21 @@ const ModernMinimal = forwardRef(function ModernMinimal(
       )}
 
       {/* Two Column Section: Education & Skills */}
-      <div className="flex gap-12">
+      <div className="flex gap-8">
         {/* Education */}
         {education?.length > 0 && (
           <section className="flex-1">
-            <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-4">
+            <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-2">
               Education
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {education.map((edu, idx) => (
                 <div key={edu.id || idx}>
-                  <h3 className="font-semibold text-[#0f172a] text-sm">
+                  <h3 className="font-semibold text-[#0f172a] text-xs">
                     {edu.degree}
-                    {edu.field && ` in ${edu.field}`}
                   </h3>
-                  <p className="text-sm text-[#64748b]">
-                    {edu.school}
-                    {edu.year && ` • ${edu.year}`}
+                  <p className="text-xs text-[#64748b]">
+                    {edu.school}{edu.year && ` • ${edu.year}`}
                   </p>
                 </div>
               ))}
@@ -158,17 +162,17 @@ const ModernMinimal = forwardRef(function ModernMinimal(
 
         {/* Skills */}
         {hasSkills && (
-          <section className="flex-1">
-            <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-4">
+          <section className="flex-[2]">
+            <h2 className="text-xs font-bold text-[#0d9488] uppercase tracking-[0.2em] mb-2">
               Skills
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {languages.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">Languages</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[9px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-1">Languages</p>
+                  <div className="flex flex-wrap gap-1">
                     {languages.map((skill, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-[#f1f5f9] text-[#334155] text-xs font-medium rounded-full">
+                      <span key={idx} className="px-2 py-0.5 bg-[#f1f5f9] text-[#334155] text-[10px] font-medium rounded-full">
                         {skill}
                       </span>
                     ))}
@@ -177,10 +181,10 @@ const ModernMinimal = forwardRef(function ModernMinimal(
               )}
               {frameworks.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">Frameworks</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[9px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-1">Frameworks</p>
+                  <div className="flex flex-wrap gap-1">
                     {frameworks.map((skill, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-[#f1f5f9] text-[#334155] text-xs font-medium rounded-full">
+                      <span key={idx} className="px-2 py-0.5 bg-[#f1f5f9] text-[#334155] text-[10px] font-medium rounded-full">
                         {skill}
                       </span>
                     ))}
@@ -189,10 +193,10 @@ const ModernMinimal = forwardRef(function ModernMinimal(
               )}
               {tools.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">Tools</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[9px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-1">Tools</p>
+                  <div className="flex flex-wrap gap-1">
                     {tools.map((skill, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-[#f1f5f9] text-[#334155] text-xs font-medium rounded-full">
+                      <span key={idx} className="px-2 py-0.5 bg-[#f1f5f9] text-[#334155] text-[10px] font-medium rounded-full">
                         {skill}
                       </span>
                     ))}
