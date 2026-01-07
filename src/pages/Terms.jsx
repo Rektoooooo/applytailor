@@ -147,8 +147,8 @@ export default function Terms() {
                 <h2 className="text-xl font-semibold text-charcoal mb-4">11. Contact</h2>
                 <p className="text-slate-600 leading-relaxed">
                   For questions about these Terms of Service, please contact us at{' '}
-                  <a href="mailto:support@applytailor.com" className="text-teal-600 hover:underline">
-                    support@applytailor.com
+                  <a href="mailto:sebastian.kucera@icloud.com" className="text-teal-600 hover:underline">
+                    sebastian.kucera@icloud.com
                   </a>
                 </p>
               </div>

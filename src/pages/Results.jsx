@@ -38,7 +38,7 @@ import { useApplications } from '../hooks/useApplications';
 import { useBaseProfile } from '../hooks/useBaseProfile';
 import { useSubscription } from '../hooks/useSubscription';
 import { CVTemplateSelector } from '../components/cv-templates';
-import { refineBullet, refineCoverLetter, CREDIT_COSTS } from '../lib/aiApi';
+import { refineBullet, refineCoverLetter, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
 
 // Default empty data for when application isn't loaded yet
 const emptyApplication = {
@@ -422,6 +422,9 @@ export default function Results() {
   const [refiningBullet, setRefiningBullet] = useState(null); // bulletId:type format
   const [refiningCoverLetter, setRefiningCoverLetter] = useState(null); // 'shorter' or 'regenerate'
 
+  // Free tier tracking
+  const [freeEditsRemaining, setFreeEditsRemaining] = useState(FREE_TIER.refinements);
+
   // List view state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -532,6 +535,11 @@ export default function Results() {
       setApplication(prev => ({ ...prev, tailored_bullets: updatedBullets }));
       await updateApplication(id, { tailored_bullets: updatedBullets });
 
+      // Update free tier tracking
+      if (result.free_tier !== undefined) {
+        setFreeEditsRemaining(result.free_tier.remaining);
+      }
+
       // Show appropriate toast based on free tier status
       if (result.was_free) {
         toast.success(`Bullet refined! (Free: ${result.free_tier?.remaining || 0} edits remaining)`);
@@ -541,7 +549,7 @@ export default function Results() {
 
       // Show alert when free tier is exhausted
       if (result.free_tier?.remaining === 0 && result.was_free) {
-        toast.info('Free edits used up! Next edits will cost 0.5 credits each.', { duration: 5000 });
+        toast.info('Free edits used up! Next edits will cost 0.25 credits each.', { duration: 5000 });
       }
 
       refreshProfile?.();
@@ -569,6 +577,11 @@ export default function Results() {
       setApplication(prev => ({ ...prev, cover_letter: result.refined }));
       await updateApplication(id, { cover_letter: result.refined });
 
+      // Update free tier tracking
+      if (result.free_tier !== undefined) {
+        setFreeEditsRemaining(result.free_tier.remaining);
+      }
+
       // Show appropriate toast based on free tier status
       const action = refinementType === 'regenerate' ? 'regenerated' : 'refined';
       if (result.was_free) {
@@ -580,7 +593,7 @@ export default function Results() {
 
       // Show alert when free tier is exhausted
       if (result.free_tier?.remaining === 0 && result.was_free) {
-        toast.info('Free edits used up! Next edits will cost 0.5 credits each.', { duration: 5000 });
+        toast.info('Free edits used up! Next edits will cost 0.25 credits each.', { duration: 5000 });
       }
 
       refreshProfile?.();
@@ -686,6 +699,49 @@ export default function Results() {
                 <p className="text-xs text-slate-500">Missing</p>
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Free Edits Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          <div className="card p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-teal-600" />
+                <span className="text-sm font-medium text-charcoal">Free Edits</span>
+              </div>
+              <span className="text-sm text-slate-500">
+                {freeEditsRemaining > 0 ? (
+                  <>{freeEditsRemaining} of {FREE_TIER.refinements} remaining</>
+                ) : (
+                  <span className="text-amber-600">0.25 credits per edit</span>
+                )}
+              </span>
+            </div>
+            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${(freeEditsRemaining / FREE_TIER.refinements) * 100}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className={`h-full rounded-full ${
+                  freeEditsRemaining > 2
+                    ? 'bg-gradient-to-r from-teal-400 to-teal-600'
+                    : freeEditsRemaining > 0
+                      ? 'bg-gradient-to-r from-amber-400 to-amber-500'
+                      : 'bg-slate-300'
+                }`}
+              />
+            </div>
+            {freeEditsRemaining === 0 && (
+              <p className="text-xs text-slate-400 mt-2">
+                You've used all free edits. Each rephrase or shortening now costs 0.25 credits.
+              </p>
+            )}
           </div>
         </motion.div>
 

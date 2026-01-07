@@ -119,8 +119,8 @@ export default function Privacy() {
                 <h2 className="text-xl font-semibold text-charcoal mb-4">8. Contact Us</h2>
                 <p className="text-slate-600 leading-relaxed">
                   If you have any questions about this Privacy Policy, please contact us at{' '}
-                  <a href="mailto:support@applytailor.com" className="text-teal-600 hover:underline">
-                    support@applytailor.com
+                  <a href="mailto:sebastian.kucera@icloud.com" className="text-teal-600 hover:underline">
+                    sebastian.kucera@icloud.com
                   </a>
                 </p>
               </div>

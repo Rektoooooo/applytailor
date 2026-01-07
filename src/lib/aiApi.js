@@ -121,8 +121,8 @@ export const CREDIT_COSTS = {
   generation_cover: 0.25,  // Cover letter only
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
-  refine_bullet: 0.5,  // After free tier
-  refine_cover: 0.5,   // After free tier
+  refine_bullet: 0.25,  // After free tier
+  refine_cover: 0.25,   // After free tier
 };
 
 // Free tier configuration

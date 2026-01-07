@@ -795,9 +795,9 @@ export default function Landing() {
               <span className="font-bold text-charcoal">ApplyTailor</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-500">
-              <a href="#" className="hover:text-teal-600 transition-colors">Privacy</a>
-              <a href="#" className="hover:text-teal-600 transition-colors">Terms</a>
-              <a href="#" className="hover:text-teal-600 transition-colors">Contact</a>
+              <Link to="/privacy" className="hover:text-teal-600 transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-teal-600 transition-colors">Terms</Link>
+              <a href="mailto:sebastian.kucera@icloud.com" className="hover:text-teal-600 transition-colors">Contact</a>
             </div>
             <p className="text-sm text-slate-400">
               &copy; {new Date().getFullYear()} ApplyTailor. All rights reserved.
