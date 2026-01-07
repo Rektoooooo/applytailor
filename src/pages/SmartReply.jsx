@@ -14,10 +14,11 @@ import {
   Briefcase,
   Gift,
   MessageCircle,
+  Coins,
 } from 'lucide-react';
 import Header from '../components/Header';
 import { getConversations, deleteConversation } from '../lib/supabase';
-import { checkFreeReplies, FREE_TIER } from '../lib/aiApi';
+import { checkFreeReplies, purchaseReplyPack, FREE_TIER, CREDIT_COSTS } from '../lib/aiApi';
 
 // Convert ISO date to relative time
 function getRelativeTime(dateString) {
@@ -62,8 +63,19 @@ export default function SmartReply() {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [freeTier, setFreeTier] = useState({ used: 0, remaining: FREE_TIER.replies, total: FREE_TIER.replies });
+  const [freeTier, setFreeTier] = useState({
+    used: 0,
+    remaining: FREE_TIER.replies,
+    total: FREE_TIER.replies,
+    needsPurchase: false,
+    initialFree: FREE_TIER.replies,
+  });
+  const [packInfo, setPackInfo] = useState({
+    cost: CREDIT_COSTS.reply_pack,
+    repliesPerPack: FREE_TIER.repliesPerPack,
+  });
   const [deletingId, setDeletingId] = useState(null);
+  const [purchasing, setPurchasing] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -88,6 +100,14 @@ export default function SmartReply() {
           used: freeTierResult.free_tier.used,
           remaining: freeTierResult.free_tier.remaining,
           total: freeTierResult.free_tier.total,
+          needsPurchase: freeTierResult.free_tier.needs_purchase,
+          initialFree: freeTierResult.free_tier.initial_free || FREE_TIER.replies,
+        });
+      }
+      if (freeTierResult?.pack_info) {
+        setPackInfo({
+          cost: freeTierResult.pack_info.cost,
+          repliesPerPack: freeTierResult.pack_info.replies_per_pack,
         });
       }
     } catch (error) {
@@ -119,7 +139,31 @@ export default function SmartReply() {
     }
   };
 
-  const freeRepliesPercentage = Math.round((freeTier.remaining / freeTier.total) * 100);
+  const handlePurchasePack = async () => {
+    setPurchasing(true);
+    try {
+      const result = await purchaseReplyPack();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      setFreeTier({
+        used: result.free_tier.used,
+        remaining: result.free_tier.remaining,
+        total: result.free_tier.total,
+        needsPurchase: false,
+        initialFree: freeTier.initialFree,
+      });
+      toast.success(`Purchased ${packInfo.repliesPerPack} replies for ${packInfo.cost} credits!`);
+    } catch (error) {
+      console.error('Purchase error:', error);
+      toast.error(error.message || 'Failed to purchase reply pack');
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+  const freeRepliesPercentage = freeTier.total > 0 ? Math.round((freeTier.remaining / freeTier.total) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-[#faf9f7]">
@@ -142,7 +186,7 @@ export default function SmartReply() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Gift className="w-4 h-4 text-teal-600" />
-              <span className="text-sm font-medium text-charcoal">Free Replies</span>
+              <span className="text-sm font-medium text-charcoal">Replies Available</span>
             </div>
             <span className="text-sm text-slate-500">
               {freeTier.remaining} of {freeTier.total} remaining
@@ -154,9 +198,34 @@ export default function SmartReply() {
               style={{ width: `${freeRepliesPercentage}%` }}
             />
           </div>
-          {freeTier.remaining === 0 && (
+          {freeTier.needsPurchase ? (
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+              <p className="text-sm text-slate-600">
+                No replies remaining. Get {packInfo.repliesPerPack} more for {packInfo.cost} credits.
+              </p>
+              <button
+                onClick={handlePurchasePack}
+                disabled={purchasing}
+                className="btn-secondary text-sm py-1.5 px-3"
+              >
+                {purchasing ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Buying...
+                  </>
+                ) : (
+                  <>
+                    <Coins className="w-3 h-3" />
+                    Buy Replies
+                  </>
+                )}
+              </button>
+            </div>
+          ) : freeTier.remaining <= 1 && (
             <p className="text-xs text-slate-500 mt-2">
-              0.1 credits per reply after free tier
+              {freeTier.remaining === 0
+                ? `Purchase ${packInfo.repliesPerPack} replies for ${packInfo.cost} credits when you run out`
+                : `${freeTier.remaining} reply left • Purchase ${packInfo.repliesPerPack} more for ${packInfo.cost} credits`}
             </p>
           )}
         </motion.div>

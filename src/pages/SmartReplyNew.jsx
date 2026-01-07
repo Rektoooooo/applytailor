@@ -14,10 +14,11 @@ import {
   Briefcase,
   ChevronDown,
   Sparkles,
+  Coins,
 } from 'lucide-react';
 import Header from '../components/Header';
 import { useApplications } from '../hooks/useApplications';
-import { generateReply, checkFreeReplies, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
+import { generateReply, checkFreeReplies, purchaseReplyPack, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
 
 const MESSAGE_TYPES = [
   { value: 'interview', label: 'Interview Invite', icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
@@ -36,7 +37,16 @@ export default function SmartReplyNew() {
   const [selectedApp, setSelectedApp] = useState('');
   const [messageType, setMessageType] = useState('');
   const [generating, setGenerating] = useState(false);
-  const [freeTier, setFreeTier] = useState({ remaining: FREE_TIER.replies, total: FREE_TIER.replies });
+  const [purchasing, setPurchasing] = useState(false);
+  const [freeTier, setFreeTier] = useState({
+    remaining: FREE_TIER.replies,
+    total: FREE_TIER.replies,
+    needsPurchase: false,
+  });
+  const [packInfo, setPackInfo] = useState({
+    cost: CREDIT_COSTS.reply_pack,
+    repliesPerPack: FREE_TIER.repliesPerPack,
+  });
 
   useEffect(() => {
     loadFreeTier();
@@ -49,10 +59,39 @@ export default function SmartReplyNew() {
         setFreeTier({
           remaining: result.free_tier.remaining,
           total: result.free_tier.total,
+          needsPurchase: result.free_tier.needs_purchase,
+        });
+      }
+      if (result?.pack_info) {
+        setPackInfo({
+          cost: result.pack_info.cost,
+          repliesPerPack: result.pack_info.replies_per_pack,
         });
       }
     } catch (error) {
       console.error('Error loading free tier:', error);
+    }
+  };
+
+  const handlePurchasePack = async () => {
+    setPurchasing(true);
+    try {
+      const result = await purchaseReplyPack();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      setFreeTier({
+        remaining: result.free_tier.remaining,
+        total: result.free_tier.total,
+        needsPurchase: false,
+      });
+      toast.success(`Purchased ${packInfo.repliesPerPack} replies for ${packInfo.cost} credits!`);
+    } catch (error) {
+      console.error('Purchase error:', error);
+      toast.error(error.message || 'Failed to purchase reply pack');
+    } finally {
+      setPurchasing(false);
     }
   };
 
@@ -90,9 +129,9 @@ export default function SmartReplyNew() {
     }
   };
 
-  const costText = freeTier.remaining > 0
-    ? `${freeTier.remaining} free repl${freeTier.remaining === 1 ? 'y' : 'ies'} remaining`
-    : `${CREDIT_COSTS.smart_reply} credits`;
+  const costText = freeTier.needsPurchase
+    ? `No replies remaining`
+    : `${freeTier.remaining} repl${freeTier.remaining === 1 ? 'y' : 'ies'} remaining`;
 
   return (
     <div className="min-h-screen bg-[#faf9f7]">
@@ -209,29 +248,49 @@ Thank you for your application. We would like to invite you for an interview..."
             </p>
           </div>
 
-          {/* Generate Button */}
+          {/* Generate Button or Purchase Option */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <Sparkles className="w-4 h-4 text-teal-500" />
               {costText}
             </div>
-            <button
-              onClick={handleGenerate}
-              disabled={generating || !pastedMessage.trim()}
-              className="btn-primary"
-            >
-              {generating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  Generate Reply
-                </>
-              )}
-            </button>
+            {freeTier.needsPurchase ? (
+              <button
+                onClick={handlePurchasePack}
+                disabled={purchasing}
+                className="btn-secondary"
+              >
+                {purchasing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Buying...
+                  </>
+                ) : (
+                  <>
+                    <Coins className="w-4 h-4" />
+                    Buy {packInfo.repliesPerPack} Replies ({packInfo.cost} credits)
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={handleGenerate}
+                disabled={generating || !pastedMessage.trim()}
+                className="btn-primary"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Generate Reply
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>

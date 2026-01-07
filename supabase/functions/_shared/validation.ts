@@ -23,13 +23,15 @@ export const CREDIT_COSTS = {
   regenerate_cover: 0.5,
   refine_bullet: 0.25,  // After free tier
   refine_cover: 0.25,   // After free tier
-  smart_reply: 0.1,    // After free tier (3 free replies)
+  smart_reply: 0.1,      // After free tier (3 free replies)
+  reply_pack: 0.10,      // 5 replies for 0.10 credits
 };
 
 // Free tier configuration
 export const FREE_TIER = {
   refinements: 5,  // First 5 refinements are free per application
   replies: 3,      // First 3 smart replies are free (lifetime)
+  repliesPerPack: 5, // Each purchased pack gives 5 replies
 };
 
 // Input limits
@@ -81,108 +83,144 @@ export async function verifyAuth(req: Request): Promise<{ userId: string } | { e
   }
 }
 
-// Get free replies used by user (lifetime)
-export async function getFreeRepliesUsed(userId: string): Promise<number> {
+// Get smart reply usage stats for user (lifetime)
+export async function getSmartReplyStats(userId: string): Promise<{ used: number; purchasedPacks: number }> {
   const supabase = getServiceClient();
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('free_replies_used')
+    .select('free_replies_used, purchased_reply_packs')
     .eq('id', userId)
     .single();
 
   if (error) {
-    console.error('Error fetching free_replies_used:', error);
-    return 0;
+    console.error('Error fetching smart reply stats:', error);
+    return { used: 0, purchasedPacks: 0 };
   }
 
-  return profile?.free_replies_used || 0;
+  return {
+    used: profile?.free_replies_used || 0,
+    purchasedPacks: profile?.purchased_reply_packs || 0,
+  };
 }
 
-// Check smart reply free tier status
+// Check smart reply free tier status (includes purchased packs)
 export async function checkSmartReplyFreeTier(
   userId: string
-): Promise<{ isFree: boolean; used: number; remaining: number }> {
-  const used = await getFreeRepliesUsed(userId);
-  const remaining = Math.max(0, FREE_TIER.replies - used);
-  const isFree = used < FREE_TIER.replies;
+): Promise<{ isFree: boolean; used: number; remaining: number; totalAllowed: number; needsPurchase: boolean }> {
+  const stats = await getSmartReplyStats(userId);
+  const totalAllowed = FREE_TIER.replies + (stats.purchasedPacks * FREE_TIER.repliesPerPack);
+  const remaining = Math.max(0, totalAllowed - stats.used);
+  const isFree = stats.used < FREE_TIER.replies; // Still within original free tier
+  const needsPurchase = remaining === 0;
 
-  return { isFree, used, remaining };
+  return { isFree, used: stats.used, remaining, totalAllowed, needsPurchase };
 }
 
-// Check and deduct credits for smart reply
+// Check and deduct for smart reply (uses allowance system like edits)
 export async function checkAndDeductSmartReplyCredits(
   userId: string
-): Promise<{ success: true; newBalance: number; wasFree: boolean; remaining: number } | { success: false; error: string }> {
+): Promise<{ success: true; newBalance: number; wasFree: boolean; remaining: number; needsPurchase?: boolean } | { success: false; error: string; needsPurchase?: boolean }> {
   const supabase = getServiceClient();
 
-  // Check free tier first
+  // Check free tier + purchased packs
   const freeTierStatus = await checkSmartReplyFreeTier(userId);
 
-  if (freeTierStatus.isFree) {
-    // Increment free_replies_used
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ free_replies_used: freeTierStatus.used + 1 })
-      .eq('id', userId);
-
-    if (updateError) {
-      console.error('Error updating free_replies_used:', updateError);
-      return { success: false, error: 'Failed to update free reply count' };
-    }
-
-    // Get current credits for response
+  // If no replies remaining, tell user to purchase more
+  if (freeTierStatus.needsPurchase) {
+    // Get current credits to show in error
     const { data: profile } = await supabase
       .from('profiles')
       .select('credits')
       .eq('id', userId)
       .single();
-
     const currentCredits = parseFloat(profile?.credits) || 0;
+
     return {
-      success: true,
-      newBalance: currentCredits,
-      wasFree: true,
-      remaining: freeTierStatus.remaining - 1,
+      success: false,
+      error: `No replies remaining. Purchase a reply pack (5 replies for ${CREDIT_COSTS.reply_pack} credits) to continue.`,
+      needsPurchase: true,
     };
   }
 
-  // Not free - deduct credits
-  const cost = CREDIT_COSTS.smart_reply;
+  // User has remaining replies (from free tier or purchased packs)
+  // Increment usage counter
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({ free_replies_used: freeTierStatus.used + 1 })
+    .eq('id', userId);
 
-  const { data: profile, error: fetchError } = await supabase
+  if (updateError) {
+    console.error('Error updating free_replies_used:', updateError);
+    return { success: false, error: 'Failed to update reply count' };
+  }
+
+  // Get current credits for response
+  const { data: profile } = await supabase
     .from('profiles')
     .select('credits')
     .eq('id', userId)
     .single();
 
+  const currentCredits = parseFloat(profile?.credits) || 0;
+  return {
+    success: true,
+    newBalance: currentCredits,
+    wasFree: freeTierStatus.isFree,
+    remaining: freeTierStatus.remaining - 1,
+  };
+}
+
+// Purchase a reply pack (5 replies for 0.10 credits)
+export async function purchaseReplyPack(
+  userId: string
+): Promise<{ success: true; newBalance: number; newRemaining: number } | { success: false; error: string }> {
+  const supabase = getServiceClient();
+  const REPLY_PACK_COST = CREDIT_COSTS.reply_pack;
+  const REPLIES_PER_PACK = FREE_TIER.repliesPerPack;
+
+  // Get current credits and stats
+  const { data: profile, error: fetchError } = await supabase
+    .from('profiles')
+    .select('credits, free_replies_used, purchased_reply_packs')
+    .eq('id', userId)
+    .single();
+
   if (fetchError) {
-    console.error('Error fetching credits:', fetchError);
     return { success: false, error: 'Failed to check credits' };
   }
 
   const currentCredits = parseFloat(profile?.credits) || 0;
 
-  if (currentCredits < cost) {
+  if (currentCredits < REPLY_PACK_COST) {
     return {
       success: false,
-      error: `Insufficient credits. You need ${cost} credits but have ${currentCredits.toFixed(2)}`,
+      error: `Insufficient credits. You need ${REPLY_PACK_COST} credits but have ${currentCredits.toFixed(2)}`,
     };
   }
 
-  // Deduct credits
-  const newBalance = currentCredits - cost;
+  // Deduct credits and increment purchased packs
+  const newBalance = currentCredits - REPLY_PACK_COST;
+  const newPacks = (profile?.purchased_reply_packs || 0) + 1;
+
   const { error: updateError } = await supabase
     .from('profiles')
-    .update({ credits: newBalance })
+    .update({
+      credits: newBalance,
+      purchased_reply_packs: newPacks,
+    })
     .eq('id', userId);
 
   if (updateError) {
-    console.error('Error deducting credits:', updateError);
-    return { success: false, error: 'Failed to deduct credits' };
+    return { success: false, error: 'Failed to purchase reply pack' };
   }
 
-  return { success: true, newBalance, wasFree: false, remaining: 0 };
+  // Calculate new remaining replies
+  const used = profile?.free_replies_used || 0;
+  const totalAllowed = FREE_TIER.replies + (newPacks * REPLIES_PER_PACK);
+  const newRemaining = Math.max(0, totalAllowed - used);
+
+  return { success: true, newBalance, newRemaining };
 }
 
 // Get total refinements used by user for a specific application

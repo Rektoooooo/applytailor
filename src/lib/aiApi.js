@@ -162,6 +162,13 @@ export async function checkFreeReplies() {
   return callEdgeFunction('check-free-replies', {});
 }
 
+/**
+ * Purchase a reply pack (5 replies for 0.10 credits)
+ */
+export async function purchaseReplyPack() {
+  return callEdgeFunction('purchase-replies', {});
+}
+
 // Credit costs for display purposes
 export const CREDIT_COSTS = {
   generation: 1.0,         // Full package
@@ -170,7 +177,8 @@ export const CREDIT_COSTS = {
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
   edit_pack: 0.25,         // 5 edits for 0.25 credits
-  smart_reply: 0.1,        // After free tier
+  smart_reply: 0.1,        // After free tier (legacy, kept for reference)
+  reply_pack: 0.10,        // 5 replies for 0.10 credits
 };
 
 // Free tier configuration
@@ -178,4 +186,5 @@ export const FREE_TIER = {
   refinements: 5,  // First 5 refinements are free per application
   editsPerPack: 5, // Each purchased pack gives 5 edits
   replies: 3,      // First 3 smart replies are free (lifetime)
+  repliesPerPack: 5, // Each purchased pack gives 5 replies
 };

@@ -1,14 +1,15 @@
-// Check remaining free smart replies for a user
-// Returns the free tier status for smart replies
+// Purchase reply pack endpoint
+// Cost: 0.10 credits for 5 replies
 
 import {
   corsHeaders,
   verifyAuth,
+  purchaseReplyPack,
   checkSmartReplyFreeTier,
   errorResponse,
   successResponse,
-  FREE_TIER,
   CREDIT_COSTS,
+  FREE_TIER,
 } from '../_shared/validation.ts';
 
 Deno.serve(async (req) => {
@@ -38,18 +39,25 @@ Deno.serve(async (req) => {
   const { userId } = authResult;
   console.log('Auth success for user:', userId);
 
-  // Get free tier status
+  // Purchase the reply pack
+  const purchaseResult = await purchaseReplyPack(userId);
+
+  if (!purchaseResult.success) {
+    return errorResponse(purchaseResult.error, 402);
+  }
+
+  // Get updated free tier status
   const freeTierStatus = await checkSmartReplyFreeTier(userId);
 
-  // Return success with free tier info
+  // Return success
   return successResponse({
+    success: true,
+    credits_remaining: purchaseResult.newBalance,
+    replies_remaining: purchaseResult.newRemaining,
     free_tier: {
       remaining: freeTierStatus.remaining,
       total: freeTierStatus.totalAllowed,
       used: freeTierStatus.used,
-      has_free: freeTierStatus.isFree,
-      needs_purchase: freeTierStatus.needsPurchase,
-      initial_free: FREE_TIER.replies,
     },
     pack_info: {
       cost: CREDIT_COSTS.reply_pack,

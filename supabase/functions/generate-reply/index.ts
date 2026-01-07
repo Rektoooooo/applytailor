@@ -279,8 +279,14 @@ Deno.serve(async (req) => {
       was_free: creditResult.wasFree,
       free_tier: {
         remaining: freeTierStatus.remaining,
-        total: FREE_TIER.replies,
+        total: freeTierStatus.totalAllowed,
         used: freeTierStatus.used,
+        needs_purchase: freeTierStatus.needsPurchase,
+        initial_free: FREE_TIER.replies,
+      },
+      pack_info: {
+        cost: CREDIT_COSTS.reply_pack,
+        replies_per_pack: FREE_TIER.repliesPerPack,
       },
     });
   } catch (error) {
