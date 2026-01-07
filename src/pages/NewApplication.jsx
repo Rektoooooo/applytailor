@@ -170,7 +170,6 @@ export default function NewApplication() {
         professional_summary: aiContent.professional_summary,
         keyword_analysis: keywordAnalysis,
         match_score: aiContent.match_score,
-        detected_language: aiContent.detected_language,
         status: 'tailored',
       });
 
