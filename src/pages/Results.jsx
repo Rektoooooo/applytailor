@@ -546,7 +546,7 @@ export default function Results() {
 
       // Show alert when edits are exhausted
       if (result.free_tier?.remaining === 0) {
-        toast.info('No edits remaining. Buy more to continue customizing.', { duration: 5000 });
+        toast('No edits remaining. Buy more to continue customizing.', { duration: 5000, icon: '⚠️' });
       }
 
       refreshProfile?.();
@@ -585,7 +585,7 @@ export default function Results() {
 
       // Show alert when edits are exhausted
       if (result.free_tier?.remaining === 0) {
-        toast.info('No edits remaining. Buy more to continue customizing.', { duration: 5000 });
+        toast('No edits remaining. Buy more to continue customizing.', { duration: 5000, icon: '⚠️' });
       }
 
       refreshProfile?.();
