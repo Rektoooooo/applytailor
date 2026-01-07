@@ -1150,7 +1150,7 @@ export default function Results() {
                     phone: baseProfile?.personal_info?.phone || '',
                     location: baseProfile?.personal_info?.address || '',
                     linkedin: baseProfile?.personal_info?.linkedin || baseProfile?.links?.linkedin || '',
-                    portfolio: baseProfile?.personal_info?.portfolio || '',
+                    portfolio: baseProfile?.personal_info?.portfolio || baseProfile?.personal_info?.website || '',
                     photo: baseProfile?.personal_info?.photo_url || ''
                   }}
                   summary={application?.professional_summary || generateSummary(application?.role, baseProfile, keywords)}
@@ -1164,7 +1164,11 @@ export default function Results() {
                       .map((b) => b.after || b.text)
                       .slice(0, 4) || exp.bullets,
                   })) || []}
-                  education={baseProfile?.education || []}
+                  education={(baseProfile?.education || []).map((edu) => ({
+                    ...edu,
+                    school: edu.school || edu.institution,
+                    year: edu.year || edu.graduation_year,
+                  }))}
                   skills={baseProfile?.skills || { languages: [], frameworks: [], tools: [] }}
                   projects={baseProfile?.projects || []}
                   onExport={() => setShowCVPreview(false)}

@@ -66,6 +66,12 @@ const ExecutiveNavy = forwardRef(function ExecutiveNavy(
                 <span className="text-white/80 break-all text-xs">{personalInfo.linkedin}</span>
               </div>
             )}
+            {personalInfo?.portfolio && (
+              <div className="flex items-start gap-3">
+                <Globe className="w-4 h-4 text-white/50 mt-0.5 flex-shrink-0" />
+                <span className="text-white/80 break-all text-xs">{personalInfo.portfolio}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -129,11 +135,11 @@ const ExecutiveNavy = forwardRef(function ExecutiveNavy(
               {education.map((edu, idx) => (
                 <div key={edu.id || idx} className="text-sm">
                   <p className="font-semibold text-white">
-                    {edu.degree}
+                    {edu.degree}{edu.field ? ` in ${edu.field}` : ''}
                   </p>
-                  <p className="text-white/60 text-xs">{edu.school}</p>
-                  {edu.year && (
-                    <p className="text-white/40 text-xs mt-0.5">{edu.year}</p>
+                  <p className="text-white/60 text-xs">{edu.school || edu.institution}</p>
+                  {(edu.year || edu.graduation_year) && (
+                    <p className="text-white/40 text-xs mt-0.5">{edu.year || edu.graduation_year}</p>
                   )}
                 </div>
               ))}

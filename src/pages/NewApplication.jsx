@@ -78,14 +78,14 @@ export default function NewApplication() {
     setError(null);
 
     try {
-      // 1. Extract company and role from job description
-      const company = extractCompany(jobInput) || 'Company';
-      const role = extractRole(jobInput) || 'Position';
+      // 1. Extract company and role from job description (fallback)
+      const fallbackCompany = extractCompany(jobInput) || 'Company';
+      const fallbackRole = extractRole(jobInput) || 'Position';
 
       // 2. Create application in database (as draft)
       const { data: app, error: createError } = await createApplication({
-        company,
-        role,
+        company: fallbackCompany,
+        role: fallbackRole,
         job_description: jobInput,
         settings,
         status: 'draft',
@@ -98,10 +98,14 @@ export default function NewApplication() {
       // 3. Call AI to generate tailored content
       const aiContent = await generateContent({
         jobDescription: jobInput,
-        companyName: company,
-        jobTitle: role,
+        companyName: fallbackCompany,
+        jobTitle: fallbackRole,
         profile: baseProfile,
       });
+
+      // Use AI-extracted company/role if available (more accurate)
+      const company = aiContent.company_name || fallbackCompany;
+      const role = aiContent.job_title || fallbackRole;
 
       // 4. Transform AI response to match database schema
       const tailoredBullets = (aiContent.tailored_bullets || []).map((bullet, index) => ({
@@ -112,6 +116,23 @@ export default function NewApplication() {
         keywords_matched: bullet.keywords_matched || [],
         accepted: null,
       }));
+
+      // Build keyword frequency map from all matched keywords in bullets
+      const keywordCounts = {};
+      tailoredBullets.forEach((bullet) => {
+        (bullet.keywords_matched || []).forEach((kw) => {
+          const normalizedKw = kw.toLowerCase().trim();
+          keywordCounts[normalizedKw] = (keywordCounts[normalizedKw] || 0) + 1;
+        });
+      });
+
+      // Also count keywords from matched requirements
+      (aiContent.keyword_analysis?.matched || []).forEach((kw) => {
+        const normalizedKw = kw.toLowerCase().trim();
+        if (!keywordCounts[normalizedKw]) {
+          keywordCounts[normalizedKw] = 1;
+        }
+      });
 
       const keywordAnalysis = {
         requirements: [
@@ -134,16 +155,22 @@ export default function NewApplication() {
             bullets: [],
           })),
         ],
-        keywords: [],
+        keywords: Object.entries(keywordCounts).map(([keyword, count]) => ({
+          keyword: keyword.charAt(0).toUpperCase() + keyword.slice(1),
+          count,
+        })).sort((a, b) => b.count - a.count).slice(0, 10),
       };
 
       // 5. Update application with AI-generated content
       const { error: updateError } = await updateApplication(app.id, {
+        company, // Use AI-extracted company
+        role, // Use AI-extracted role
         tailored_bullets: tailoredBullets,
         cover_letter: aiContent.cover_letter,
         professional_summary: aiContent.professional_summary,
         keyword_analysis: keywordAnalysis,
         match_score: aiContent.match_score,
+        detected_language: aiContent.detected_language,
         status: 'tailored',
       });
 

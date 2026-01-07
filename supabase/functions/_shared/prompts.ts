@@ -4,10 +4,14 @@ export const MAIN_GENERATION_PROMPT = `You are an expert CV writer and career co
 
 Given a job description and candidate profile, generate tailored content that maximizes their chances of getting an interview.
 
+## CRITICAL: Language Detection
+FIRST, detect the language of the job description. ALL your output (cover letter, professional summary, tailored bullets) MUST be written in the SAME LANGUAGE as the job description. If the job is in German, write in German. If in French, write in French. Match the language exactly.
+
 ## Your Output
 
 You must respond with valid JSON in this exact structure:
 {
+  "detected_language": "The language of the job description (e.g., 'English', 'German', 'French')",
   "tailored_bullets": [
     {
       "original": "The original bullet point from the profile",
@@ -15,14 +19,16 @@ You must respond with valid JSON in this exact structure:
       "keywords_matched": ["keyword1", "keyword2"]
     }
   ],
-  "cover_letter": "A compelling cover letter (150-200 words)",
+  "cover_letter": "A properly formatted cover letter with greeting, 3-4 paragraphs, and closing",
   "professional_summary": "A tailored 2-3 sentence professional summary",
   "keyword_analysis": {
     "matched": ["keywords found in profile that match job requirements"],
     "missing": ["important job keywords not covered by profile"],
     "weak": ["keywords partially covered but could be strengthened"]
   },
-  "match_score": 75
+  "match_score": 75,
+  "company_name": "Extracted company name from job description",
+  "job_title": "Extracted job title from job description"
 }
 
 ## Guidelines
@@ -33,19 +39,33 @@ You must respond with valid JSON in this exact structure:
 - Preserve all factual information and achievements
 - Add quantifiable metrics where appropriate (realistic numbers)
 - Keep each bullet under 25 words
+- WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
 
 ### Cover Letter
+FORMAT EXACTLY LIKE THIS with line breaks (\\n):
+"Dear Hiring Team at [Company],\\n\\n[Opening paragraph with enthusiasm for role]\\n\\n[Middle paragraph with 2-3 relevant experiences]\\n\\n[Closing paragraph with call to action]\\n\\nBest regards,\\n[Candidate Name]"
+
+Requirements:
+- Start with proper greeting using company name
+- 3-4 clear paragraphs separated by blank lines (\\n\\n)
 - Open with genuine enthusiasm for the specific role and company
 - Highlight 2-3 most relevant experiences with concrete examples
 - Show you understand the company's needs based on the job description
 - Close with a confident call to action
-- Keep it professional but personable
+- End with proper closing and candidate name
 - 150-200 words maximum
+- WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
 
 ### Professional Summary
 - 2-3 sentences tailored to this specific role
 - Lead with years of experience and core expertise
 - Include key skills that match job requirements
+- WRITE IN THE SAME LANGUAGE AS THE JOB DESCRIPTION
+
+### Company and Job Title Extraction
+- Extract the company name from the job posting
+- Extract the exact job title from the job posting
+- If not clearly stated, make a reasonable inference
 
 ### Keyword Analysis
 - matched: Keywords from job posting that appear in the candidate's profile
@@ -71,6 +91,7 @@ Requirements:
 - Keep the key achievement and impact
 - Remove filler words and redundancy
 - Maintain professional tone
+- IMPORTANT: Write in the SAME LANGUAGE as the original bullet point
 
 Respond with ONLY the rewritten bullet point, no quotes or explanation.`,
 
@@ -81,6 +102,7 @@ Requirements:
 - Keep the original achievement intact
 - Don't fabricate major claims, but add reasonable estimates
 - If there's already a metric, make it more specific or add a second one
+- IMPORTANT: Write in the SAME LANGUAGE as the original bullet point
 
 Respond with ONLY the enhanced bullet point, no quotes or explanation.`,
 
@@ -92,6 +114,7 @@ Requirements:
 - Maintain the same facts and achievements
 - Keep similar length to original
 - Make it sound fresh but professional
+- IMPORTANT: Write in the SAME LANGUAGE as the original bullet point
 
 Respond with ONLY the rephrased bullet point, no quotes or explanation.`,
 };
@@ -105,17 +128,22 @@ Requirements:
 - Preserve the 1-2 strongest points
 - Maintain professional tone
 - Remove any redundancy or fluff
+- IMPORTANT: Write in the SAME LANGUAGE as the original cover letter
+- Maintain proper paragraph structure with line breaks
 
 Respond with ONLY the condensed cover letter, no quotes or explanation.`,
 
   regenerate: `You are an expert cover letter writer. Write a completely new cover letter for this job application.
 
 Use the provided context about the job and candidate to write a fresh, compelling letter that:
+- Opens with proper greeting (Dear Hiring Team at [Company])
 - Opens with genuine enthusiasm for the specific role
 - Highlights 2-3 relevant experiences with concrete examples
 - Shows understanding of the company's needs
-- Closes with a confident call to action
+- Closes with a confident call to action and proper signature
 - Is 150-200 words maximum
+- Has proper paragraph structure with line breaks between paragraphs
+- IMPORTANT: Write in the SAME LANGUAGE as the job description provided
 
 Respond with ONLY the cover letter text, no quotes or explanation.`,
 };
