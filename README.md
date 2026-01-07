@@ -96,15 +96,25 @@ Keep all your applications organized. Track status from draft to offer accepted.
 ## Screenshots
 
 <p align="center">
-  <em>Dashboard with application overview and stats</em>
+  <img src="public/screenshot-dashboard.png" alt="Dashboard" width="800" />
+  <br />
+  <em>Dashboard — Track all your applications with stats and quick actions</em>
 </p>
 
-<p align="center">
-  <em>Tailored results with CV bullets, cover letter, and keyword analysis</em>
-</p>
+<br />
 
 <p align="center">
-  <em>Smart Reply for professional email responses</em>
+  <img src="public/screenshot-results.png" alt="Application Results" width="800" />
+  <br />
+  <em>Results — Tailored CV bullets, keyword coverage, and requirement matching</em>
+</p>
+
+<br />
+
+<p align="center">
+  <img src="public/screenshot-smart-reply.png" alt="Smart Reply" width="800" />
+  <br />
+  <em>Smart Reply — Professional responses to recruiter emails in seconds</em>
 </p>
 
 ---
