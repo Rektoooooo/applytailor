@@ -114,6 +114,15 @@ export async function refineCoverLetter({
   });
 }
 
+/**
+ * Purchase an edit pack (5 edits for 0.25 credits)
+ */
+export async function purchaseEditPack({ applicationId }) {
+  return callEdgeFunction('purchase-edits', {
+    application_id: applicationId,
+  });
+}
+
 // Credit costs for display purposes
 export const CREDIT_COSTS = {
   generation: 1.0,         // Full package
@@ -121,11 +130,11 @@ export const CREDIT_COSTS = {
   generation_cover: 0.25,  // Cover letter only
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
-  refine_bullet: 0.25,  // After free tier
-  refine_cover: 0.25,   // After free tier
+  edit_pack: 0.25,         // 5 edits for 0.25 credits
 };
 
 // Free tier configuration
 export const FREE_TIER = {
-  refinements: 5,  // First 5 refinements are free
+  refinements: 5,  // First 5 refinements are free per application
+  editsPerPack: 5, // Each purchased pack gives 5 edits
 };

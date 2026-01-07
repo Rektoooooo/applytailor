@@ -86,8 +86,8 @@ Deno.serve(async (req) => {
   const bullet = sanitizeText(body.bullet);
   const jobContext = body.job_context ? sanitizeText(body.job_context) : undefined;
 
-  // Check and deduct credits
-  const creditResult = await checkAndDeductCredits(userId, 'refine_bullet');
+  // Check and deduct credits (pass applicationId for per-application free tier)
+  const creditResult = await checkAndDeductCredits(userId, 'refine_bullet', body.application_id);
   if (!creditResult.success) {
     return errorResponse(creditResult.error, 402);
   }
@@ -119,11 +119,11 @@ Deno.serve(async (req) => {
       return errorResponse('AI returned an invalid response. Please try again.', 503);
     }
 
-    // Record rate limit usage
-    await recordRateLimitUsage(userId, 'refinement');
+    // Record rate limit usage (with applicationId for per-application tracking)
+    await recordRateLimitUsage(userId, 'refinement', body.application_id);
 
     // Get updated free tier status (after recording usage)
-    const freeTierStatus = await checkFreeTier(userId);
+    const freeTierStatus = await checkFreeTier(userId, body.application_id);
 
     // Return success with refined bullet
     return successResponse({

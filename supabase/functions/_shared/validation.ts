@@ -79,14 +79,15 @@ export async function verifyAuth(req: Request): Promise<{ userId: string } | { e
   }
 }
 
-// Get total refinements used by user (all time)
-export async function getTotalRefinementsUsed(userId: string): Promise<number> {
+// Get total refinements used by user for a specific application
+export async function getRefinementsUsedForApplication(userId: string, applicationId: string): Promise<number> {
   const supabase = getServiceClient();
 
   const { count, error } = await supabase
     .from('rate_limits')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
+    .eq('application_id', applicationId)
     .eq('action_type', 'refinement');
 
   if (error) {
@@ -97,35 +98,137 @@ export async function getTotalRefinementsUsed(userId: string): Promise<number> {
   return count || 0;
 }
 
-// Check if refinement is free (within free tier)
+// Check if refinement is free or within purchased allowance for this application
 export async function checkFreeTier(
-  userId: string
-): Promise<{ isFree: boolean; used: number; remaining: number }> {
-  const used = await getTotalRefinementsUsed(userId);
-  const remaining = Math.max(0, FREE_TIER.refinements - used);
+  userId: string,
+  applicationId: string
+): Promise<{ isFree: boolean; used: number; remaining: number; canEdit: boolean; needsPurchase: boolean }> {
+  const supabase = getServiceClient();
+
+  // Get edits used for this application
+  const used = await getRefinementsUsedForApplication(userId, applicationId);
+
+  // Get purchased edit packs for this application
+  const { data: application } = await supabase
+    .from('applications')
+    .select('purchased_edit_packs')
+    .eq('id', applicationId)
+    .single();
+
+  const purchasedPacks = application?.purchased_edit_packs || 0;
+  const totalAllowed = FREE_TIER.refinements + (purchasedPacks * 5);
+  const remaining = Math.max(0, totalAllowed - used);
+  const isFree = used < FREE_TIER.refinements; // Still within free 5
+  const canEdit = remaining > 0;
+  const needsPurchase = !canEdit;
 
   return {
-    isFree: used < FREE_TIER.refinements,
+    isFree,
     used,
     remaining,
+    canEdit,
+    needsPurchase,
   };
+}
+
+// Purchase an edit pack (5 edits for 0.25 credits)
+export async function purchaseEditPack(
+  userId: string,
+  applicationId: string
+): Promise<{ success: true; newBalance: number; newRemaining: number } | { success: false; error: string }> {
+  const supabase = getServiceClient();
+  const EDIT_PACK_COST = 0.25;
+  const EDITS_PER_PACK = 5;
+
+  // Get current credits
+  const { data: profile, error: fetchError } = await supabase
+    .from('profiles')
+    .select('credits')
+    .eq('id', userId)
+    .single();
+
+  if (fetchError) {
+    return { success: false, error: 'Failed to check credits' };
+  }
+
+  const currentCredits = parseFloat(profile?.credits) || 0;
+
+  if (currentCredits < EDIT_PACK_COST) {
+    return {
+      success: false,
+      error: `Insufficient credits. You need ${EDIT_PACK_COST} credits but have ${currentCredits.toFixed(2)}`,
+    };
+  }
+
+  // Verify user owns the application
+  const { data: application, error: appError } = await supabase
+    .from('applications')
+    .select('id, purchased_edit_packs')
+    .eq('id', applicationId)
+    .eq('user_id', userId)
+    .single();
+
+  if (appError || !application) {
+    return { success: false, error: 'Application not found or access denied' };
+  }
+
+  // Deduct credits and increment purchased packs
+  const newBalance = currentCredits - EDIT_PACK_COST;
+  const newPacks = (application.purchased_edit_packs || 0) + 1;
+
+  const { error: updateCreditsError } = await supabase
+    .from('profiles')
+    .update({ credits: newBalance })
+    .eq('id', userId);
+
+  if (updateCreditsError) {
+    return { success: false, error: 'Failed to deduct credits' };
+  }
+
+  const { error: updateAppError } = await supabase
+    .from('applications')
+    .update({ purchased_edit_packs: newPacks })
+    .eq('id', applicationId);
+
+  if (updateAppError) {
+    // Refund credits if app update failed
+    await supabase.from('profiles').update({ credits: currentCredits }).eq('id', userId);
+    return { success: false, error: 'Failed to add edit pack' };
+  }
+
+  // Calculate new remaining edits
+  const used = await getRefinementsUsedForApplication(userId, applicationId);
+  const totalAllowed = FREE_TIER.refinements + (newPacks * EDITS_PER_PACK);
+  const newRemaining = Math.max(0, totalAllowed - used);
+
+  return { success: true, newBalance, newRemaining };
 }
 
 // Check and deduct credits
 export async function checkAndDeductCredits(
   userId: string,
-  actionType: keyof typeof CREDIT_COSTS
-): Promise<{ success: true; newBalance: number; wasFree?: boolean } | { success: false; error: string }> {
+  actionType: keyof typeof CREDIT_COSTS,
+  applicationId?: string // Required for refinements to check per-application free tier
+): Promise<{ success: true; newBalance: number; wasFree?: boolean; needsPurchase?: boolean } | { success: false; error: string; needsPurchase?: boolean }> {
   const supabase = getServiceClient();
 
-  // Check if this is a refinement action that might be free
+  // Check if this is a refinement action that might be free or within purchased allowance
   const isRefinement = actionType === 'refine_bullet' || actionType === 'refine_cover';
 
-  if (isRefinement) {
-    const freeTierStatus = await checkFreeTier(userId);
+  if (isRefinement && applicationId) {
+    const freeTierStatus = await checkFreeTier(userId, applicationId);
 
-    if (freeTierStatus.isFree) {
-      // Get current balance to return (no deduction)
+    // If no edits remaining, tell user to purchase more
+    if (freeTierStatus.needsPurchase) {
+      return {
+        success: false,
+        error: 'No edits remaining. Purchase more edits to continue.',
+        needsPurchase: true
+      };
+    }
+
+    // If user can edit (has remaining from free or purchased packs), no credit deduction
+    if (freeTierStatus.canEdit) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('credits')
@@ -133,7 +236,7 @@ export async function checkAndDeductCredits(
         .single();
 
       const currentCredits = parseFloat(profile?.credits) || 0;
-      return { success: true, newBalance: currentCredits, wasFree: true };
+      return { success: true, newBalance: currentCredits, wasFree: freeTierStatus.isFree };
     }
   }
 
@@ -266,13 +369,15 @@ export async function checkRateLimit(
 // Record rate limit usage
 export async function recordRateLimitUsage(
   userId: string,
-  actionType: 'generation' | 'refinement'
+  actionType: 'generation' | 'refinement',
+  applicationId?: string // Required for refinements to track per-application
 ): Promise<void> {
   const supabase = getServiceClient();
 
   await supabase.from('rate_limits').insert({
     user_id: userId,
     action_type: actionType,
+    application_id: applicationId || null,
   });
 }
 

@@ -96,8 +96,8 @@ Deno.serve(async (req) => {
   // Determine credit cost based on refinement type
   const creditAction = body.refinement_type === 'regenerate' ? 'regenerate_cover' : 'refine_cover';
 
-  // Check and deduct credits
-  const creditResult = await checkAndDeductCredits(userId, creditAction);
+  // Check and deduct credits (pass applicationId for per-application free tier)
+  const creditResult = await checkAndDeductCredits(userId, creditAction, body.application_id);
   if (!creditResult.success) {
     return errorResponse(creditResult.error, 402);
   }
@@ -134,11 +134,11 @@ Deno.serve(async (req) => {
       return errorResponse('AI returned an invalid response. Please try again.', 503);
     }
 
-    // Record rate limit usage
-    await recordRateLimitUsage(userId, 'refinement');
+    // Record rate limit usage (with applicationId for per-application tracking)
+    await recordRateLimitUsage(userId, 'refinement', body.application_id);
 
     // Get updated free tier status (after recording usage)
-    const freeTierStatus = await checkFreeTier(userId);
+    const freeTierStatus = await checkFreeTier(userId, body.application_id);
 
     // Return success with refined cover letter
     return successResponse({

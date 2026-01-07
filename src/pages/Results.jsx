@@ -38,7 +38,7 @@ import { useApplications } from '../hooks/useApplications';
 import { useBaseProfile } from '../hooks/useBaseProfile';
 import { useSubscription } from '../hooks/useSubscription';
 import { CVTemplateSelector } from '../components/cv-templates';
-import { refineBullet, refineCoverLetter, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
+import { refineBullet, refineCoverLetter, purchaseEditPack, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
 
 // Default empty data for when application isn't loaded yet
 const emptyApplication = {
@@ -424,6 +424,7 @@ export default function Results() {
 
   // Free tier tracking
   const [freeEditsRemaining, setFreeEditsRemaining] = useState(FREE_TIER.refinements);
+  const [purchasingEdits, setPurchasingEdits] = useState(false);
 
   // List view state
   const [searchQuery, setSearchQuery] = useState('');
@@ -540,16 +541,12 @@ export default function Results() {
         setFreeEditsRemaining(result.free_tier.remaining);
       }
 
-      // Show appropriate toast based on free tier status
-      if (result.was_free) {
-        toast.success(`Bullet refined! (Free: ${result.free_tier?.remaining || 0} edits remaining)`);
-      } else {
-        toast.success(`Bullet refined (${CREDIT_COSTS.refine_bullet} credits used)`);
-      }
+      // Show success toast
+      toast.success(`Bullet refined! (${result.free_tier?.remaining || 0} edits remaining)`);
 
-      // Show alert when free tier is exhausted
-      if (result.free_tier?.remaining === 0 && result.was_free) {
-        toast.info('Free edits used up! Next edits will cost 0.25 credits each.', { duration: 5000 });
+      // Show alert when edits are exhausted
+      if (result.free_tier?.remaining === 0) {
+        toast.info('No edits remaining. Buy more to continue customizing.', { duration: 5000 });
       }
 
       refreshProfile?.();
@@ -582,18 +579,13 @@ export default function Results() {
         setFreeEditsRemaining(result.free_tier.remaining);
       }
 
-      // Show appropriate toast based on free tier status
+      // Show success toast
       const action = refinementType === 'regenerate' ? 'regenerated' : 'refined';
-      if (result.was_free) {
-        toast.success(`Cover letter ${action}! (Free: ${result.free_tier?.remaining || 0} edits remaining)`);
-      } else {
-        const creditCost = refinementType === 'regenerate' ? CREDIT_COSTS.regenerate_cover : CREDIT_COSTS.refine_cover;
-        toast.success(`Cover letter ${action} (${creditCost} credits used)`);
-      }
+      toast.success(`Cover letter ${action}! (${result.free_tier?.remaining || 0} edits remaining)`);
 
-      // Show alert when free tier is exhausted
-      if (result.free_tier?.remaining === 0 && result.was_free) {
-        toast.info('Free edits used up! Next edits will cost 0.25 credits each.', { duration: 5000 });
+      // Show alert when edits are exhausted
+      if (result.free_tier?.remaining === 0) {
+        toast.info('No edits remaining. Buy more to continue customizing.', { duration: 5000 });
       }
 
       refreshProfile?.();
@@ -601,6 +593,21 @@ export default function Results() {
       toast.error(err.message || 'Failed to refine cover letter');
     } finally {
       setRefiningCoverLetter(null);
+    }
+  };
+
+  // Handle purchasing more edits
+  const handlePurchaseEdits = async () => {
+    setPurchasingEdits(true);
+    try {
+      const result = await purchaseEditPack({ applicationId: id });
+      setFreeEditsRemaining(result.edits_remaining);
+      toast.success(`Purchased 5 edits! (${result.edits_remaining} edits remaining)`);
+      refreshProfile?.();
+    } catch (err) {
+      toast.error(err.message || 'Failed to purchase edits');
+    } finally {
+      setPurchasingEdits(false);
     }
   };
 
@@ -713,20 +720,20 @@ export default function Results() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-teal-600" />
-                <span className="text-sm font-medium text-charcoal">Free Edits</span>
+                <span className="text-sm font-medium text-charcoal">Edits for this Application</span>
               </div>
               <span className="text-sm text-slate-500">
                 {freeEditsRemaining > 0 ? (
-                  <>{freeEditsRemaining} of {FREE_TIER.refinements} remaining</>
+                  <>{freeEditsRemaining} remaining</>
                 ) : (
-                  <span className="text-amber-600">0.25 credits per edit</span>
+                  <span className="text-amber-600">No edits remaining</span>
                 )}
               </span>
             </div>
             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${(freeEditsRemaining / FREE_TIER.refinements) * 100}%` }}
+                animate={{ width: `${Math.min((freeEditsRemaining / FREE_TIER.refinements) * 100, 100)}%` }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className={`h-full rounded-full ${
                   freeEditsRemaining > 2
@@ -738,9 +745,28 @@ export default function Results() {
               />
             </div>
             {freeEditsRemaining === 0 && (
-              <p className="text-xs text-slate-400 mt-2">
-                You've used all free edits. Each rephrase or shortening now costs 0.25 credits.
-              </p>
+              <div className="flex items-center justify-between mt-3">
+                <p className="text-xs text-slate-400">
+                  You've used all edits for this application.
+                </p>
+                <button
+                  onClick={handlePurchaseEdits}
+                  disabled={purchasingEdits}
+                  className="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-medium rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                  {purchasingEdits ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Purchasing...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      Buy 5 edits for 0.25 credits
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </div>
         </motion.div>
