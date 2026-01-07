@@ -495,7 +495,7 @@ export default function Landing() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#faf9f7]/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="ApplyTailor" className="w-10 h-10 object-contain" />
+            <img src="/logo.png" alt="ApplyTailor" className="w-10 h-10 object-contain rounded-xl" />
             <span className="text-xl font-bold text-charcoal tracking-tight">ApplyTailor</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -959,16 +959,7 @@ export default function Landing() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
 
-            {/* Cat mascot */}
-            <motion.img
-              src="/logo-transparent.png"
-              alt=""
-              className="absolute -bottom-4 -right-4 w-40 h-40 opacity-20 hidden lg:block"
-              initial={{ rotate: -10 }}
-              whileInView={{ rotate: 5 }}
-              transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-            />
-
+            
             <div className="relative z-10">
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
                 Ready to land more interviews?
@@ -998,7 +989,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="ApplyTailor" className="w-9 h-9 object-contain" />
+              <img src="/logo.png" alt="ApplyTailor" className="w-9 h-9 object-contain rounded-lg" />
               <span className="font-bold text-charcoal">ApplyTailor</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-500">

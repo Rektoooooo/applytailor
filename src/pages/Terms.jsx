@@ -9,7 +9,7 @@ export default function Terms() {
       <header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/landing" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="ApplyTailor" className="w-11 h-11 object-contain" />
+            <img src="/logo.png" alt="ApplyTailor" className="w-11 h-11 object-contain rounded-xl" />
             <span className="text-xl font-bold text-charcoal">ApplyTailor</span>
           </Link>
           <Link to="/landing" className="flex items-center gap-2 text-slate-600 hover:text-teal-600 transition-colors">

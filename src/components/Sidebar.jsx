@@ -76,7 +76,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-[73px] px-6 flex items-center border-b border-slate-100 justify-between">
         <NavLink to="/dashboard" className="flex items-center gap-3 group" onClick={handleNavClick}>
-          <img src="/logo.png" alt="ApplyTailor" className="w-11 h-11 object-contain group-hover:scale-105 transition-transform" />
+          <img src="/logo.png" alt="ApplyTailor" className="w-11 h-11 object-contain rounded-xl group-hover:scale-105 transition-transform" />
           <div>
             <h1 className="text-xl font-bold text-charcoal tracking-tight">ApplyTailor</h1>
             <p className="text-xs text-slate-400">Smart job applications</p>

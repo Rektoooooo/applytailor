@@ -113,7 +113,7 @@ export default function Login() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-3 mb-8">
-          <img src="/logo.png" alt="ApplyTailor" className="w-12 h-12 object-contain" />
+          <img src="/logo.png" alt="ApplyTailor" className="w-12 h-12 object-contain rounded-xl" />
           <span className="text-2xl font-bold text-charcoal">ApplyTailor</span>
         </Link>
 

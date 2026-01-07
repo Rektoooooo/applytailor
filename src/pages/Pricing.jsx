@@ -96,7 +96,7 @@ export default function Pricing() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-cream/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="ApplyTailor" className="w-10 h-10 object-contain" />
+            <img src="/logo.png" alt="ApplyTailor" className="w-10 h-10 object-contain rounded-xl" />
             <span className="text-xl font-bold text-charcoal">ApplyTailor</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -282,7 +282,7 @@ export default function Pricing() {
       <footer className="py-8 px-6 border-t border-slate-100">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="ApplyTailor" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="ApplyTailor" className="w-8 h-8 object-contain rounded-lg" />
             <span className="text-sm font-medium text-charcoal">ApplyTailor</span>
           </div>
           <div className="flex gap-6 text-sm text-slate-500">
