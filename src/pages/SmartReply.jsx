@@ -163,7 +163,10 @@ export default function SmartReply() {
     }
   };
 
-  const freeRepliesPercentage = freeTier.total > 0 ? Math.round((freeTier.remaining / freeTier.total) * 100) : 0;
+  // Display logic: show "X of 3" for free tier, "X of 5" for purchased packs
+  const displayTotal = freeTier.used < (freeTier.initialFree || 3) ? (freeTier.initialFree || 3) : packInfo.repliesPerPack;
+  const displayRemaining = Math.min(freeTier.remaining, displayTotal);
+  const freeRepliesPercentage = displayTotal > 0 ? Math.round((displayRemaining / displayTotal) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-[#faf9f7]">
@@ -189,7 +192,7 @@ export default function SmartReply() {
               <span className="text-sm font-medium text-charcoal">Replies Available</span>
             </div>
             <span className="text-sm text-slate-500">
-              {freeTier.remaining} of {freeTier.total} remaining
+              {displayRemaining} of {displayTotal} remaining
             </span>
           </div>
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">

@@ -129,9 +129,14 @@ export default function SmartReplyNew() {
     }
   };
 
+  // Display logic: show "X of 3" for free tier, "X of 5" for purchased packs
+  const isInFreeTier = freeTier.used < 3;
+  const displayTotal = isInFreeTier ? 3 : packInfo.repliesPerPack;
+  const displayRemaining = Math.min(freeTier.remaining, displayTotal);
+
   const costText = freeTier.needsPurchase
     ? `No replies remaining`
-    : `${freeTier.remaining} repl${freeTier.remaining === 1 ? 'y' : 'ies'} remaining`;
+    : `${displayRemaining} of ${displayTotal} remaining`;
 
   return (
     <div className="min-h-screen bg-[#faf9f7]">
