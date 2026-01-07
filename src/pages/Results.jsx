@@ -206,7 +206,7 @@ function ApplicationsList({ applications, loading, searchQuery, setSearchQuery, 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 className="card p-4 hover:shadow-md transition-shadow cursor-pointer group"
-                onClick={() => navigate(`/results/${app.id}`)}
+                onClick={() => navigate(`/dashboard/results/${app.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -294,7 +294,7 @@ function ApplicationsList({ applications, loading, searchQuery, setSearchQuery, 
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/results/${app.id}`);
+                          navigate(`/dashboard/results/${app.id}`);
                         }}
                         className="p-2 hover:bg-teal-50 rounded-lg text-slate-400 hover:text-teal-600 transition-colors"
                         title="View Details"
