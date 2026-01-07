@@ -8,7 +8,8 @@ import {
   Settings,
   LogOut,
   Coins,
-  X
+  X,
+  MessageSquareReply
 } from 'lucide-react';
 import { LogoIcon } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,6 +22,7 @@ const navItems = [
   { to: '/dashboard/profile', icon: User, label: 'Base Profile' },
   { to: '/dashboard/new', icon: PlusCircle, label: 'New Application' },
   { to: '/dashboard/results', icon: FileText, label: 'Applications' },
+  { to: '/smart-reply', icon: MessageSquareReply, label: 'Smart Reply' },
 ];
 
 const bottomItems = [

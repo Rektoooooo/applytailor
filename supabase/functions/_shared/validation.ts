@@ -23,11 +23,13 @@ export const CREDIT_COSTS = {
   regenerate_cover: 0.5,
   refine_bullet: 0.25,  // After free tier
   refine_cover: 0.25,   // After free tier
+  smart_reply: 0.1,    // After free tier (3 free replies)
 };
 
 // Free tier configuration
 export const FREE_TIER = {
-  refinements: 5,  // First 5 refinements are free
+  refinements: 5,  // First 5 refinements are free per application
+  replies: 3,      // First 3 smart replies are free (lifetime)
 };
 
 // Input limits
@@ -77,6 +79,110 @@ export async function verifyAuth(req: Request): Promise<{ userId: string } | { e
   } catch (error) {
     return { error: 'Authentication failed' };
   }
+}
+
+// Get free replies used by user (lifetime)
+export async function getFreeRepliesUsed(userId: string): Promise<number> {
+  const supabase = getServiceClient();
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('free_replies_used')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching free_replies_used:', error);
+    return 0;
+  }
+
+  return profile?.free_replies_used || 0;
+}
+
+// Check smart reply free tier status
+export async function checkSmartReplyFreeTier(
+  userId: string
+): Promise<{ isFree: boolean; used: number; remaining: number }> {
+  const used = await getFreeRepliesUsed(userId);
+  const remaining = Math.max(0, FREE_TIER.replies - used);
+  const isFree = used < FREE_TIER.replies;
+
+  return { isFree, used, remaining };
+}
+
+// Check and deduct credits for smart reply
+export async function checkAndDeductSmartReplyCredits(
+  userId: string
+): Promise<{ success: true; newBalance: number; wasFree: boolean; remaining: number } | { success: false; error: string }> {
+  const supabase = getServiceClient();
+
+  // Check free tier first
+  const freeTierStatus = await checkSmartReplyFreeTier(userId);
+
+  if (freeTierStatus.isFree) {
+    // Increment free_replies_used
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ free_replies_used: freeTierStatus.used + 1 })
+      .eq('id', userId);
+
+    if (updateError) {
+      console.error('Error updating free_replies_used:', updateError);
+      return { success: false, error: 'Failed to update free reply count' };
+    }
+
+    // Get current credits for response
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('credits')
+      .eq('id', userId)
+      .single();
+
+    const currentCredits = parseFloat(profile?.credits) || 0;
+    return {
+      success: true,
+      newBalance: currentCredits,
+      wasFree: true,
+      remaining: freeTierStatus.remaining - 1,
+    };
+  }
+
+  // Not free - deduct credits
+  const cost = CREDIT_COSTS.smart_reply;
+
+  const { data: profile, error: fetchError } = await supabase
+    .from('profiles')
+    .select('credits')
+    .eq('id', userId)
+    .single();
+
+  if (fetchError) {
+    console.error('Error fetching credits:', fetchError);
+    return { success: false, error: 'Failed to check credits' };
+  }
+
+  const currentCredits = parseFloat(profile?.credits) || 0;
+
+  if (currentCredits < cost) {
+    return {
+      success: false,
+      error: `Insufficient credits. You need ${cost} credits but have ${currentCredits.toFixed(2)}`,
+    };
+  }
+
+  // Deduct credits
+  const newBalance = currentCredits - cost;
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({ credits: newBalance })
+    .eq('id', userId);
+
+  if (updateError) {
+    console.error('Error deducting credits:', updateError);
+    return { success: false, error: 'Failed to deduct credits' };
+  }
+
+  return { success: true, newBalance, wasFree: false, remaining: 0 };
 }
 
 // Get total refinements used by user for a specific application

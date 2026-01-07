@@ -25,6 +25,9 @@ import Results from './pages/Results';
 import Settings from './pages/Settings';
 import CVTemplates from './pages/CVTemplates';
 import TopUp from './pages/TopUp';
+import SmartReply from './pages/SmartReply';
+import SmartReplyNew from './pages/SmartReplyNew';
+import SmartReplyConversation from './pages/SmartReplyConversation';
 
 function App() {
   return (
@@ -85,6 +88,20 @@ function App() {
             <Route path="templates" element={<CVTemplates />} />
             <Route path="settings" element={<Settings />} />
             <Route path="topup" element={<TopUp />} />
+          </Route>
+
+          {/* Smart Reply routes - protected, with sidebar layout */}
+          <Route
+            path="/smart-reply"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<SmartReply />} />
+            <Route path="new" element={<SmartReplyNew />} />
+            <Route path=":id" element={<SmartReplyConversation />} />
           </Route>
 
           {/* Catch-all redirect */}

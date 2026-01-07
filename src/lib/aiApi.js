@@ -132,6 +132,33 @@ export async function checkRemainingEdits({ applicationId }) {
   });
 }
 
+/**
+ * Generate a smart reply to an email/message
+ * Cost: 0.1 credits (after 3 free replies)
+ */
+export async function generateReply({
+  pastedMessage,
+  userInstructions,
+  applicationId,
+  conversationId,
+  messageType,
+}) {
+  return callEdgeFunction('generate-reply', {
+    pasted_message: pastedMessage,
+    user_instructions: userInstructions,
+    application_id: applicationId,
+    conversation_id: conversationId,
+    message_type: messageType,
+  });
+}
+
+/**
+ * Check remaining free smart replies
+ */
+export async function checkFreeReplies() {
+  return callEdgeFunction('check-free-replies', {});
+}
+
 // Credit costs for display purposes
 export const CREDIT_COSTS = {
   generation: 1.0,         // Full package
@@ -140,10 +167,12 @@ export const CREDIT_COSTS = {
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
   edit_pack: 0.25,         // 5 edits for 0.25 credits
+  smart_reply: 0.1,        // After free tier
 };
 
 // Free tier configuration
 export const FREE_TIER = {
   refinements: 5,  // First 5 refinements are free per application
   editsPerPack: 5, // Each purchased pack gives 5 edits
+  replies: 3,      // First 3 smart replies are free (lifetime)
 };

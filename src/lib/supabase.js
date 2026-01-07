@@ -105,3 +105,44 @@ export const getSession = async () => {
   const { data: { session }, error } = await supabase.auth.getSession();
   return { session, error };
 };
+
+// Smart Reply conversation helpers
+export const getConversations = async () => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      applications(company, role)
+    `)
+    .order('updated_at', { ascending: false });
+  return { data, error };
+};
+
+export const getConversation = async (conversationId) => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      applications(company, role),
+      conversation_messages(*)
+    `)
+    .eq('id', conversationId)
+    .single();
+
+  // Sort messages by created_at if we got data
+  if (data?.conversation_messages) {
+    data.conversation_messages.sort((a, b) =>
+      new Date(a.created_at) - new Date(b.created_at)
+    );
+  }
+
+  return { data, error };
+};
+
+export const deleteConversation = async (conversationId) => {
+  const { error } = await supabase
+    .from('conversations')
+    .delete()
+    .eq('id', conversationId);
+  return { error };
+};
