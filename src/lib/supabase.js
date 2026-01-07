@@ -146,3 +146,13 @@ export const deleteConversation = async (conversationId) => {
     .eq('id', conversationId);
   return { error };
 };
+
+// Purchase history helper
+export const getPurchaseHistory = async (userId) => {
+  const { data, error } = await supabase
+    .from('purchase_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('purchased_at', { ascending: false });
+  return { data, error };
+};

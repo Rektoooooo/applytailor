@@ -12,6 +12,13 @@ const supabase = createClient(
 
 const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') as string;
 
+// Map credits to package name
+function getPackageName(credits: number): string {
+  if (credits >= 150) return 'Pro';
+  if (credits >= 75) return 'Standard';
+  return 'Starter';
+}
+
 Deno.serve(async (req) => {
   const signature = req.headers.get('stripe-signature');
 
@@ -61,6 +68,17 @@ Deno.serve(async (req) => {
         if (updateError) {
           return new Response(`Error updating profile: ${updateError.message}`, { status: 500 });
         }
+
+        // Record purchase in history
+        await supabase.from('purchase_history').insert({
+          user_id: userId,
+          stripe_session_id: session.id,
+          credits_purchased: credits,
+          amount_cents: session.amount_total || 0,
+          currency: session.currency || 'usd',
+          package_name: getPackageName(credits),
+          purchased_at: new Date(session.created * 1000).toISOString(),
+        });
 
         break;
       }

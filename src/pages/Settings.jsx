@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
@@ -14,13 +14,14 @@ import {
   Trash2,
   Download,
   Sparkles,
-  Plus
+  Plus,
+  Receipt
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
-import { supabase, signOut, updatePassword } from '../lib/supabase';
+import { supabase, signOut, updatePassword, getPurchaseHistory } from '../lib/supabase';
 
 const tabs = [
   { id: 'account', label: 'Account', icon: User },
@@ -154,12 +155,39 @@ const INITIAL_FREE_CREDITS = 1;
 
 function CreditsTab() {
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const [purchases, setPurchases] = useState([]);
+  const [loadingPurchases, setLoadingPurchases] = useState(true);
 
   const credits = profile?.credits || 0;
   const totalPurchased = profile?.total_credits_purchased || 0;
   const totalReceived = totalPurchased + INITIAL_FREE_CREDITS;
   const creditsUsed = totalReceived - credits;
+
+  useEffect(() => {
+    async function fetchPurchases() {
+      if (!user?.id) return;
+      const { data } = await getPurchaseHistory(user.id);
+      setPurchases(data || []);
+      setLoadingPurchases(false);
+    }
+    fetchPurchases();
+  }, [user?.id]);
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const formatAmount = (cents, currency = 'usd') => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(cents / 100);
+  };
 
   return (
     <motion.div
@@ -229,6 +257,62 @@ function CreditsTab() {
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Purchase History */}
+      <div className="card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Receipt className="w-5 h-5 text-slate-600" />
+          <h3 className="font-semibold text-charcoal">Purchase History</h3>
+        </div>
+
+        {loadingPurchases ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+          </div>
+        ) : purchases.length === 0 ? (
+          <div className="text-center py-8">
+            <Receipt className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <p className="text-sm text-slate-500">No purchases yet</p>
+            <button
+              onClick={() => navigate('/dashboard/topup')}
+              className="text-sm text-teal-600 hover:text-teal-700 mt-2"
+            >
+              Buy your first credits
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {purchases.map((purchase) => (
+              <div
+                key={purchase.id}
+                className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+                    <Coins className="w-4 h-4 text-teal-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-charcoal">
+                      {purchase.package_name} Package
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {formatDate(purchase.purchased_at)}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-charcoal">
+                    +{purchase.credits_purchased} credits
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {formatAmount(purchase.amount_cents, purchase.currency)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Low Credits Warning */}
