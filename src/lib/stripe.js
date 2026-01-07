@@ -14,31 +14,31 @@ export const getStripe = () => {
   return stripePromise;
 };
 
-// Credits-based pricing configuration
+// Credits-based pricing configuration - Value Leader Pricing
 export const CREDIT_PACKAGES = {
   starter: {
     name: 'Starter',
-    credits: 20,
-    price: 5,
-    pricePerCredit: 0.25,
-    priceId: import.meta.env.VITE_STRIPE_STARTER_PRICE_ID,
+    credits: 25,
+    price: 3,
+    pricePerCredit: 0.12,
+    priceId: import.meta.env.VITE_STRIPE_STARTER_PRICE_ID || 'price_1Sn1FyQgLWTUHkxnYesiQ5QP',
     popular: false,
   },
   standard: {
     name: 'Standard',
-    credits: 50,
-    price: 10,
-    pricePerCredit: 0.20,
-    priceId: import.meta.env.VITE_STRIPE_STANDARD_PRICE_ID,
-    popular: true,
+    credits: 75,
+    price: 7,
+    pricePerCredit: 0.09,
+    priceId: import.meta.env.VITE_STRIPE_STANDARD_PRICE_ID || 'price_1Sn1GHQgLWTUHkxnRN2Lu6gq',
+    popular: false,
   },
   pro: {
     name: 'Pro',
-    credits: 100,
-    price: 15,
-    pricePerCredit: 0.15,
-    priceId: import.meta.env.VITE_STRIPE_PRO_PRICE_ID,
-    popular: false,
+    credits: 150,
+    price: 12,
+    pricePerCredit: 0.08,
+    priceId: import.meta.env.VITE_STRIPE_PRO_PRICE_ID || 'price_1Sn1GWQgLWTUHkxnOSTGV4Ga',
+    popular: true,
   },
 };
 
