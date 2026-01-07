@@ -1,31 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Bell, Coins, X, CheckCircle, FileText, Sparkles, Menu } from 'lucide-react';
+import { Search, Bell, Coins, X, CheckCircle, FileText, Sparkles, Menu, AlertCircle, Info } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSearch } from '../contexts/SearchContext';
 import { useMobileMenu } from '../contexts/MobileMenuContext';
-
-const mockNotifications = [
-  {
-    id: 1,
-    type: 'success',
-    title: 'Welcome to ApplyTailor!',
-    message: 'Start by building your Base Profile',
-    time: 'Just now',
-    read: false,
-  },
-];
+import { useNotifications, NOTIFICATION_TYPES } from '../hooks/useNotifications';
 
 export default function Header({ title, subtitle }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { profile } = useAuth();
   const { searchQuery, setSearchQuery } = useSearch();
   const { openMenu } = useMobileMenu();
+  const { notifications, unreadCount, dismissNotification, markAllRead } = useNotifications();
   const credits = profile?.credits || 0;
   const [showNotifications, setShowNotifications] = useState(false);
   const isDashboard = location.pathname === '/';
-  const [notifications, setNotifications] = useState(mockNotifications);
   const notificationRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -39,24 +30,25 @@ export default function Header({ title, subtitle }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAllRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
-  };
-
-  const dismissNotification = (id) => {
-    setNotifications(notifications.filter((n) => n.id !== id));
+  const handleNotificationClick = (notification) => {
+    if (notification.link) {
+      navigate(notification.link);
+      setShowNotifications(false);
+    }
   };
 
   const getIcon = (type) => {
     switch (type) {
-      case 'success':
+      case NOTIFICATION_TYPES.SUCCESS:
         return <CheckCircle className="w-5 h-5 text-teal-500" />;
-      case 'application':
+      case NOTIFICATION_TYPES.WARNING:
+        return <AlertCircle className="w-5 h-5 text-amber-500" />;
+      case NOTIFICATION_TYPES.INFO:
+        return <Info className="w-5 h-5 text-blue-500" />;
+      case NOTIFICATION_TYPES.APPLICATION:
         return <FileText className="w-5 h-5 text-blue-500" />;
       default:
-        return <Sparkles className="w-5 h-5 text-amber-500" />;
+        return <Sparkles className="w-5 h-5 text-slate-500" />;
     }
   };
 
@@ -144,9 +136,10 @@ export default function Header({ title, subtitle }) {
                       notifications.map((notification) => (
                         <div
                           key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
                           className={`px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors ${
                             !notification.read ? 'bg-teal-50/30' : ''
-                          }`}
+                          } ${notification.link ? 'cursor-pointer' : ''}`}
                         >
                           <div className="flex gap-3">
                             <div className="flex-shrink-0 mt-0.5">
@@ -164,7 +157,10 @@ export default function Header({ title, subtitle }) {
                               </p>
                             </div>
                             <button
-                              onClick={() => dismissNotification(notification.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                dismissNotification(notification.id);
+                              }}
                               className="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600 rounded"
                             >
                               <X className="w-4 h-4" />
@@ -175,7 +171,8 @@ export default function Header({ title, subtitle }) {
                     ) : (
                       <div className="px-4 py-8 text-center">
                         <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="text-sm text-slate-500">No notifications</p>
+                        <p className="text-sm text-slate-500">All caught up!</p>
+                        <p className="text-xs text-slate-400 mt-1">No new notifications</p>
                       </div>
                     )}
                   </div>
