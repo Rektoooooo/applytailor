@@ -47,11 +47,15 @@ function detectMessageType(message: string): string {
 
 function buildSystemPrompt(messageType: string): string {
   const basePrompt = `You are a professional career assistant helping job seekers respond to application-related emails.
+
+IMPORTANT: Detect the language of the incoming message and respond in THE SAME LANGUAGE. If the message is in German, reply in German. If in French, reply in French. Match the language exactly.
+
 Generate a complete, ready-to-send reply that is:
 - Professional but warm in tone
 - Concise (2-4 paragraphs max)
 - Directly addresses points in the original message
 - Appropriate for the message type
+- In the SAME LANGUAGE as the original message
 
 Do NOT include:
 - Subject lines
