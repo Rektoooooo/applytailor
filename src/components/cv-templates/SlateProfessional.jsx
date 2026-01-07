@@ -180,24 +180,19 @@ const SlateProfessional = forwardRef(function SlateProfessional(
 
       {/* Projects */}
       {projects?.length > 0 && (
-        <section className="mt-6">
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-[0.2em] mb-3">
+        <section className="mt-4">
+          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-[0.2em] mb-2">
             Projects
           </h2>
-          <div className="grid grid-cols-2 gap-4">
-            {projects.slice(0, 4).map((project, idx) => (
+          <div className="grid grid-cols-2 gap-3">
+            {projects.slice(0, 2).map((project, idx) => (
               <div key={project.id || idx}>
                 <h3 className="font-semibold text-slate-800 text-sm">
                   {project.name}
                 </h3>
-                {project.description && (
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {project.description}
-                  </p>
-                )}
                 {project.technologies?.length > 0 && (
-                  <p className="text-xs text-slate-400 mt-1">
-                    {project.technologies.join(', ')}
+                  <p className="text-xs text-slate-400">
+                    {project.technologies.slice(0, 3).join(' · ')}
                   </p>
                 )}
               </div>

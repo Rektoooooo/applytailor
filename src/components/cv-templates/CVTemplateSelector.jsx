@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
-import { Check, Loader2, ZoomIn, ZoomOut, FileText, AlertTriangle } from 'lucide-react';
+import { Check, Loader2, ZoomIn, ZoomOut, FileText } from 'lucide-react';
 import ClassicProfessional from './ClassicProfessional';
 import ModernMinimal from './ModernMinimal';
 import CreativeBold from './CreativeBold';
@@ -194,24 +194,6 @@ export default function CVTemplateSelector({
         </div>
       )}
 
-      {overflowCheck.hasOverflow && (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-amber-800">Content adjusted to fit template</p>
-              <ul className="mt-1 text-xs text-amber-700 space-y-0.5">
-                {overflowCheck.warnings.slice(0, 3).map((warning, i) => (
-                  <li key={i}>{warning.message}</li>
-                ))}
-                {overflowCheck.warnings.length > 3 && (
-                  <li>...and {overflowCheck.warnings.length - 3} more adjustments</li>
-                )}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main Content */}
       <div className="flex gap-6 flex-1 min-h-0">

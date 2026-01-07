@@ -115,52 +115,43 @@ const EmeraldFresh = forwardRef(function EmeraldFresh(
           </section>
         )}
 
-        {/* Two columns: Skills & Education */}
+        {/* Skills & Education & Projects - Compact Row */}
         <div className="flex gap-6">
           {/* Skills */}
           {hasSkills && (
             <section className="flex-1">
-              <h2 className="flex items-center gap-3 text-lg font-bold text-slate-800 mb-4">
-                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
-                  <span className="text-white text-sm">02</span>
+              <h2 className="flex items-center gap-2 text-base font-bold text-slate-800 mb-2">
+                <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <span className="text-white text-[10px]">02</span>
                 </div>
                 Skills
               </h2>
-              <div className="space-y-3 pl-11">
+              <div className="space-y-2 pl-8">
                 {languages.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Languages</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {languages.map((skill, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1">
+                    {languages.slice(0, 4).map((skill, idx) => (
+                      <span key={idx} className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-medium rounded-full">
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 )}
                 {frameworks.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Frameworks</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {frameworks.map((skill, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-emerald-200 text-emerald-900 text-xs font-medium rounded-full">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1">
+                    {frameworks.slice(0, 4).map((skill, idx) => (
+                      <span key={idx} className="px-2 py-0.5 bg-emerald-200 text-emerald-900 text-[10px] font-medium rounded-full">
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 )}
                 {tools.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tools</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {tools.map((skill, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-200">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1">
+                    {tools.slice(0, 4).map((skill, idx) => (
+                      <span key={idx} className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-medium rounded-full border border-emerald-200">
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 )}
               </div>
@@ -170,20 +161,19 @@ const EmeraldFresh = forwardRef(function EmeraldFresh(
           {/* Education */}
           {education?.length > 0 && (
             <section className="flex-1">
-              <h2 className="flex items-center gap-3 text-lg font-bold text-slate-800 mb-4">
-                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
-                  <span className="text-white text-sm">03</span>
+              <h2 className="flex items-center gap-2 text-base font-bold text-slate-800 mb-2">
+                <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <span className="text-white text-[10px]">03</span>
                 </div>
                 Education
               </h2>
-              <div className="space-y-3 pl-11">
-                {education.map((edu, idx) => (
+              <div className="space-y-2 pl-8">
+                {education.slice(0, 2).map((edu, idx) => (
                   <div key={edu.id || idx}>
-                    <h3 className="font-semibold text-slate-800 text-sm">
+                    <h3 className="font-semibold text-slate-800 text-xs">
                       {edu.degree}
-                      {edu.field && ` - ${edu.field}`}
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-[10px] text-slate-500">
                       {edu.school}
                       {edu.year && ` | ${edu.year}`}
                     </p>
@@ -192,40 +182,32 @@ const EmeraldFresh = forwardRef(function EmeraldFresh(
               </div>
             </section>
           )}
-        </div>
 
-        {/* Projects */}
-        {projects?.length > 0 && (
-          <section className="mt-6">
-            <h2 className="flex items-center gap-3 text-lg font-bold text-slate-800 mb-4">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
-                <span className="text-white text-sm">04</span>
-              </div>
-              Projects
-            </h2>
-            <div className="grid grid-cols-2 gap-4 pl-11">
-              {projects.slice(0, 4).map((project, idx) => (
-                <div key={project.id || idx} className="p-3 bg-slate-50 rounded-lg">
-                  <h3 className="font-semibold text-slate-800 text-sm">
-                    {project.name}
-                  </h3>
-                  {project.description && (
-                    <p className="text-xs text-slate-500 mt-1">{project.description}</p>
-                  )}
-                  {project.technologies?.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {project.technologies.slice(0, 3).map((tech, techIdx) => (
-                        <span key={techIdx} className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+          {/* Projects */}
+          {projects?.length > 0 && (
+            <section className="flex-1">
+              <h2 className="flex items-center gap-2 text-base font-bold text-slate-800 mb-2">
+                <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <span className="text-white text-[10px]">04</span>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+                Projects
+              </h2>
+              <div className="space-y-2 pl-8">
+                {projects.slice(0, 2).map((project, idx) => (
+                  <div key={project.id || idx}>
+                    <h3 className="font-semibold text-slate-800 text-xs">
+                      {project.name}
+                    </h3>
+                    {project.technologies?.length > 0 && (
+                      <p className="text-[10px] text-emerald-600">
+                        {project.technologies.slice(0, 3).join(' · ')}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
       </div>
     </div>
   );
