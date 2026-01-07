@@ -10,12 +10,14 @@ import {
   checkRateLimit,
   recordRateLimitUsage,
   checkAndDeductCredits,
+  checkFreeTier,
   refundCredits,
   validateBullet,
   sanitizeText,
   verifyApplicationOwnership,
   errorResponse,
   successResponse,
+  FREE_TIER,
 } from '../_shared/validation.ts';
 
 interface RefineBulletRequest {
@@ -121,12 +123,21 @@ serve(async (req) => {
     // Record rate limit usage
     await recordRateLimitUsage(userId, 'refinement');
 
+    // Get updated free tier status (after recording usage)
+    const freeTierStatus = await checkFreeTier(userId);
+
     // Return success with refined bullet
     return successResponse({
       original: bullet,
       refined: refinedBullet,
       refinement_type: body.refinement_type,
       credits_remaining: creditResult.newBalance,
+      was_free: creditResult.wasFree || false,
+      free_tier: {
+        remaining: freeTierStatus.remaining,
+        total: FREE_TIER.refinements,
+        used: freeTierStatus.used,
+      },
     });
   } catch (error) {
     console.error('Refinement error:', error);

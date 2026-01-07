@@ -19,8 +19,13 @@ export const CREDIT_COSTS = {
   generation: 1.0,
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
-  refine_bullet: 0.25,
-  refine_cover: 0.25,
+  refine_bullet: 0.5,  // After free tier
+  refine_cover: 0.5,   // After free tier
+};
+
+// Free tier configuration
+export const FREE_TIER = {
+  refinements: 5,  // First 5 refinements are free
 };
 
 // Input limits
@@ -72,12 +77,64 @@ export async function verifyAuth(req: Request): Promise<{ userId: string } | { e
   }
 }
 
+// Get total refinements used by user (all time)
+export async function getTotalRefinementsUsed(userId: string): Promise<number> {
+  const supabase = getServiceClient();
+
+  const { count, error } = await supabase
+    .from('rate_limits')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('action_type', 'refinement');
+
+  if (error) {
+    console.error('Error counting refinements:', error);
+    return 0;
+  }
+
+  return count || 0;
+}
+
+// Check if refinement is free (within free tier)
+export async function checkFreeTier(
+  userId: string
+): Promise<{ isFree: boolean; used: number; remaining: number }> {
+  const used = await getTotalRefinementsUsed(userId);
+  const remaining = Math.max(0, FREE_TIER.refinements - used);
+
+  return {
+    isFree: used < FREE_TIER.refinements,
+    used,
+    remaining,
+  };
+}
+
 // Check and deduct credits
 export async function checkAndDeductCredits(
   userId: string,
   actionType: keyof typeof CREDIT_COSTS
-): Promise<{ success: true; newBalance: number } | { success: false; error: string }> {
+): Promise<{ success: true; newBalance: number; wasFree?: boolean } | { success: false; error: string }> {
   const supabase = getServiceClient();
+
+  // Check if this is a refinement action that might be free
+  const isRefinement = actionType === 'refine_bullet' || actionType === 'refine_cover';
+
+  if (isRefinement) {
+    const freeTierStatus = await checkFreeTier(userId);
+
+    if (freeTierStatus.isFree) {
+      // Get current balance to return (no deduction)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', userId)
+        .single();
+
+      const currentCredits = parseFloat(profile?.credits) || 0;
+      return { success: true, newBalance: currentCredits, wasFree: true };
+    }
+  }
+
   const cost = CREDIT_COSTS[actionType];
 
   // Get current credits

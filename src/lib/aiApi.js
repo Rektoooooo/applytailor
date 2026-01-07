@@ -115,6 +115,11 @@ export const CREDIT_COSTS = {
   generation: 1.0,
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
-  refine_bullet: 0.25,
-  refine_cover: 0.25,
+  refine_bullet: 0.5,  // After free tier
+  refine_cover: 0.5,   // After free tier
+};
+
+// Free tier configuration
+export const FREE_TIER = {
+  refinements: 5,  // First 5 refinements are free
 };

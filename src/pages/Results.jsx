@@ -532,7 +532,18 @@ export default function Results() {
       setApplication(prev => ({ ...prev, tailored_bullets: updatedBullets }));
       await updateApplication(id, { tailored_bullets: updatedBullets });
 
-      toast.success(`Bullet refined (${CREDIT_COSTS.refine_bullet} credit used)`);
+      // Show appropriate toast based on free tier status
+      if (result.was_free) {
+        toast.success(`Bullet refined! (Free: ${result.free_tier?.remaining || 0} edits remaining)`);
+      } else {
+        toast.success(`Bullet refined (${CREDIT_COSTS.refine_bullet} credits used)`);
+      }
+
+      // Show alert when free tier is exhausted
+      if (result.free_tier?.remaining === 0 && result.was_free) {
+        toast.info('Free edits used up! Next edits will cost 0.5 credits each.', { duration: 5000 });
+      }
+
       refreshProfile?.();
     } catch (err) {
       toast.error(err.message || 'Failed to refine bullet');
@@ -558,8 +569,20 @@ export default function Results() {
       setApplication(prev => ({ ...prev, cover_letter: result.refined }));
       await updateApplication(id, { cover_letter: result.refined });
 
-      const creditCost = refinementType === 'regenerate' ? CREDIT_COSTS.regenerate_cover : CREDIT_COSTS.refine_cover;
-      toast.success(`Cover letter ${refinementType === 'regenerate' ? 'regenerated' : 'refined'} (${creditCost} credit used)`);
+      // Show appropriate toast based on free tier status
+      const action = refinementType === 'regenerate' ? 'regenerated' : 'refined';
+      if (result.was_free) {
+        toast.success(`Cover letter ${action}! (Free: ${result.free_tier?.remaining || 0} edits remaining)`);
+      } else {
+        const creditCost = refinementType === 'regenerate' ? CREDIT_COSTS.regenerate_cover : CREDIT_COSTS.refine_cover;
+        toast.success(`Cover letter ${action} (${creditCost} credits used)`);
+      }
+
+      // Show alert when free tier is exhausted
+      if (result.free_tier?.remaining === 0 && result.was_free) {
+        toast.info('Free edits used up! Next edits will cost 0.5 credits each.', { duration: 5000 });
+      }
+
       refreshProfile?.();
     } catch (err) {
       toast.error(err.message || 'Failed to refine cover letter');

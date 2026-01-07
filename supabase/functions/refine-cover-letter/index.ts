@@ -10,13 +10,14 @@ import {
   checkRateLimit,
   recordRateLimitUsage,
   checkAndDeductCredits,
+  checkFreeTier,
   refundCredits,
   validateCoverLetter,
   sanitizeText,
   verifyApplicationOwnership,
   errorResponse,
   successResponse,
-  CREDIT_COSTS,
+  FREE_TIER,
 } from '../_shared/validation.ts';
 
 interface RefineCoverLetterRequest {
@@ -137,12 +138,21 @@ serve(async (req) => {
     // Record rate limit usage
     await recordRateLimitUsage(userId, 'refinement');
 
+    // Get updated free tier status (after recording usage)
+    const freeTierStatus = await checkFreeTier(userId);
+
     // Return success with refined cover letter
     return successResponse({
       original: coverLetter,
       refined: refinedCoverLetter,
       refinement_type: body.refinement_type,
       credits_remaining: creditResult.newBalance,
+      was_free: creditResult.wasFree || false,
+      free_tier: {
+        remaining: freeTierStatus.remaining,
+        total: FREE_TIER.refinements,
+        used: freeTierStatus.used,
+      },
     });
   } catch (error) {
     console.error('Refinement error:', error);

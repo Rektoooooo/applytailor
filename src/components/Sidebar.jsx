@@ -7,7 +7,6 @@ import {
   FileText,
   Settings,
   LogOut,
-  FileStack,
   Coins
 } from 'lucide-react';
 import { LogoIcon } from './Logo';
@@ -20,7 +19,6 @@ const navItems = [
   { to: '/profile', icon: User, label: 'Base Profile' },
   { to: '/new', icon: PlusCircle, label: 'New Application' },
   { to: '/results', icon: FileText, label: 'Applications' },
-  { to: '/templates', icon: FileStack, label: 'CV Templates' },
 ];
 
 const bottomItems = [
