@@ -1,5 +1,4 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   User,
@@ -100,28 +99,27 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item, index) => (
-          <motion.div
+          <NavLink
             key={item.to}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05 }}
+            to={item.to}
+            end={item.to === '/dashboard'}
+            onClick={handleNavClick}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${
+                isActive
+                  ? 'bg-teal-50 text-teal-700'
+                  : 'text-slate-600 hover:bg-warm-gray hover:text-charcoal'
+              }`
+            }
           >
-            <NavLink
-              to={item.to}
-              end={item.to === '/'}
-              onClick={handleNavClick}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-teal-50 text-teal-700 border-l-2 border-teal-600'
-                    : 'text-slate-600 hover:bg-warm-gray hover:text-charcoal'
-                }`
-              }
-            >
-              <item.icon className="w-5 h-5" />
-              <span>{item.label}</span>
-            </NavLink>
-          </motion.div>
+            {({ isActive }) => (
+              <>
+                <div className={`w-1.5 h-1.5 rounded-full transition-colors ${isActive ? 'bg-teal-500' : 'bg-transparent'}`} />
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </>
+            )}
+          </NavLink>
         ))}
       </nav>
 

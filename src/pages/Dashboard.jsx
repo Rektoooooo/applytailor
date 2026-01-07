@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Clock,
   ArrowRight,
-  Briefcase,
   CheckCircle2,
   Target,
   SearchX,
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import Header from '../components/Header';
 import StatusBadge from '../components/StatusBadge';
+import CompanyLogo from '../components/CompanyLogo';
 import { useSearch } from '../contexts/SearchContext';
 import { useApplications } from '../hooks/useApplications';
 import { useBaseProfile } from '../hooks/useBaseProfile';
@@ -209,9 +209,7 @@ export default function Dashboard() {
                     className="flex items-center justify-between p-4 hover:bg-warm-gray transition-colors group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-slate-500" />
-                      </div>
+                      <CompanyLogo company={app.company} size="sm" />
                       <div>
                         <h3 className="font-medium text-charcoal group-hover:text-teal-700 transition-colors">
                           {app.role || 'Untitled Role'}

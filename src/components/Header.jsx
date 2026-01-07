@@ -16,7 +16,7 @@ export default function Header({ title, subtitle }) {
   const { notifications, unreadCount, dismissNotification, markAllRead } = useNotifications();
   const credits = profile?.credits || 0;
   const [showNotifications, setShowNotifications] = useState(false);
-  const isDashboard = location.pathname === '/';
+  const isDashboard = location.pathname === '/dashboard' || location.pathname === '/';
   const notificationRef = useRef(null);
 
   // Close dropdown when clicking outside
