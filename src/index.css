@@ -114,4 +114,14 @@
   .animation-delay-400 {
     animation-delay: 400ms;
   }
+
+  /* Hide scrollbar for mobile horizontal tabs */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

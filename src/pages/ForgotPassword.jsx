@@ -35,7 +35,7 @@ export default function ForgotPassword() {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <div className="card p-8 text-center">
+          <div className="card p-6 md:p-8 text-center">
             <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Mail className="w-8 h-8 text-teal-600" />
             </div>
@@ -68,7 +68,7 @@ export default function ForgotPassword() {
           <span className="text-2xl font-bold text-charcoal">ApplyTailor</span>
         </Link>
 
-        <div className="card p-8">
+        <div className="card p-6 md:p-8">
           <h1 className="text-2xl font-bold text-charcoal text-center mb-2">Reset your password</h1>
           <p className="text-slate-500 text-center mb-6">
             Enter your email and we'll send you a reset link

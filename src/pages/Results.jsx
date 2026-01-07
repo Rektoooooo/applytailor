@@ -119,15 +119,15 @@ function ApplicationsList({ applications, loading, searchQuery, setSearchQuery, 
     <div className="min-h-screen">
       <Header title="Applications" subtitle="View and manage all your tailored applications" />
 
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {/* Search and Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-6"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-6"
         >
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
@@ -140,7 +140,7 @@ function ApplicationsList({ applications, loading, searchQuery, setSearchQuery, 
 
           {/* Status Filter */}
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-slate-400" />
+            <Filter className="w-4 h-4 text-slate-400 hidden sm:block" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -656,12 +656,12 @@ export default function Results() {
         subtitle={`${application.role || 'Untitled Role'} at ${application.company || 'Unknown Company'}`}
       />
 
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-4 gap-4 mb-6"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6"
         >
           <div className="card p-4">
             <div className="flex items-center gap-3">
@@ -772,13 +772,13 @@ export default function Results() {
         </motion.div>
 
         {/* Three Column Layout */}
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Left Column - Requirements */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="col-span-3"
+            className="lg:col-span-3 order-2 lg:order-1"
           >
             <div className="card p-4 sticky top-24">
               <h3 className=" font-semibold text-charcoal mb-4 flex items-center gap-2">
@@ -846,7 +846,7 @@ export default function Results() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="col-span-5"
+            className="lg:col-span-5 order-1 lg:order-2"
           >
             <div className="card p-4">
               <div className="flex items-center justify-between mb-4">
@@ -1059,7 +1059,7 @@ export default function Results() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="col-span-4"
+            className="lg:col-span-4 order-3"
           >
             <div className="space-y-4">
               {/* Cover Letter */}

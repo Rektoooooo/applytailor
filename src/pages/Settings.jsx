@@ -36,15 +36,15 @@ export default function Settings() {
     <div className="min-h-screen">
       <Header title="Settings" subtitle="Manage your account and preferences" />
 
-      <div className="p-8">
-        <div className="flex gap-8 max-w-4xl mx-auto">
+      <div className="p-4 md:p-8">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 max-w-4xl mx-auto">
           {/* Tab Navigation */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="w-48 flex-shrink-0"
+            className="w-full md:w-48 flex-shrink-0"
           >
-            <nav className="card p-2 space-y-1 sticky top-24">
+            <nav className="card p-2 flex md:flex-col gap-1 md:space-y-1 overflow-x-auto md:overflow-visible md:sticky md:top-24 scrollbar-hide">
               {tabs.map((tab, index) => (
                 <motion.button
                   key={tab.id}
@@ -52,14 +52,14 @@ export default function Settings() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                  className={`flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'bg-teal-50 text-teal-700 font-medium'
                       : 'text-slate-600 hover:bg-warm-gray hover:text-charcoal'
                   }`}
                 >
-                  <tab.icon className="w-5 h-5" />
-                  <span className="text-sm">{tab.label}</span>
+                  <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">{tab.label}</span>
                 </motion.button>
               ))}
             </nav>

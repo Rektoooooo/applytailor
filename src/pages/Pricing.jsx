@@ -155,7 +155,7 @@ export default function Pricing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + index * 0.1 }}
-              className={`card p-8 relative ${
+              className={`card p-6 md:p-8 relative ${
                 pkg.popular ? 'border-2 border-teal-500 shadow-lg' : ''
               }`}
             >

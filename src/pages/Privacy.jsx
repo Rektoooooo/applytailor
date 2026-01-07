@@ -41,7 +41,7 @@ export default function Privacy() {
           </div>
 
           <div className="prose prose-slate max-w-none">
-            <section className="card p-8 space-y-6">
+            <section className="card p-6 md:p-8 space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-charcoal mb-4">1. Information We Collect</h2>
                 <p className="text-slate-600 leading-relaxed">

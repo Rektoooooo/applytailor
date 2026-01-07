@@ -112,7 +112,7 @@ export default function BaseProfile() {
         subtitle="Your master profile powers all tailored applications"
       />
 
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         {/* Progress Bar - only show if profile is loaded and incomplete */}
         {!loading && baseProfile?.completion_percentage !== undefined && baseProfile.completion_percentage < 100 && (
           <motion.div
@@ -140,14 +140,14 @@ export default function BaseProfile() {
           </motion.div>
         )}
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Tab Navigation */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="w-56 flex-shrink-0"
+            className="w-full lg:w-56 flex-shrink-0"
           >
-            <nav className="card p-2 space-y-1 sticky top-24">
+            <nav className="card p-2 flex lg:flex-col gap-1 lg:space-y-1 overflow-x-auto lg:overflow-visible lg:sticky lg:top-24 scrollbar-hide">
               {tabs.map((tab, index) => (
                 <motion.button
                   key={tab.id}
@@ -155,14 +155,14 @@ export default function BaseProfile() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'bg-teal-50 text-teal-700 font-medium'
                       : 'text-slate-600 hover:bg-warm-gray hover:text-charcoal'
                   }`}
                 >
-                  <tab.icon className="w-5 h-5" />
-                  <span className="text-sm">{tab.label}</span>
+                  <tab.icon className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <span className="text-xs lg:text-sm">{tab.label}</span>
                 </motion.button>
               ))}
             </nav>
@@ -171,7 +171,7 @@ export default function BaseProfile() {
           {/* Content Area */}
           <div className="flex-1">
             {loading ? (
-              <div className="card p-8 text-center">
+              <div className="card p-6 md:p-8 text-center">
                 <Loader2 className="w-8 h-8 text-teal-500 mx-auto mb-3 animate-spin" />
                 <p className="text-slate-500">Loading your profile...</p>
               </div>
@@ -459,7 +459,7 @@ function ExperienceTab({ data = [], onUpdate }) {
       className="space-y-4"
     >
       {data.length === 0 ? (
-        <div className="card p-8 text-center">
+        <div className="card p-6 md:p-8 text-center">
           <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 font-medium">No work experience yet</p>
           <p className="text-sm text-slate-400 mt-1">Add your work history to get started</p>
@@ -637,7 +637,7 @@ function ProjectsTab({ data = [], onUpdate }) {
       className="space-y-4"
     >
       {data.length === 0 ? (
-        <div className="card p-8 text-center">
+        <div className="card p-6 md:p-8 text-center">
           <FolderKanban className="w-10 h-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 font-medium">No projects yet</p>
           <p className="text-sm text-slate-400 mt-1">Showcase your best work</p>
@@ -884,7 +884,7 @@ function EducationTab({ data = [], onUpdate }) {
       className="space-y-4"
     >
       {data.length === 0 ? (
-        <div className="card p-8 text-center">
+        <div className="card p-6 md:p-8 text-center">
           <GraduationCap className="w-10 h-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 font-medium">No education added yet</p>
           <p className="text-sm text-slate-400 mt-1">Add your educational background (high school, university, certifications, etc.)</p>
@@ -1282,7 +1282,7 @@ function AchievementsTab({ data = [], onUpdate }) {
       </div>
 
       {data.length === 0 ? (
-        <div className="card p-8 text-center">
+        <div className="card p-6 md:p-8 text-center">
           <Trophy className="w-10 h-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 font-medium">No achievements yet</p>
           <p className="text-sm text-slate-400 mt-1">Add your key accomplishments and wins</p>

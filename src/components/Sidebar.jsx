@@ -7,11 +7,13 @@ import {
   FileText,
   Settings,
   LogOut,
-  Coins
+  Coins,
+  X
 } from 'lucide-react';
 import { LogoIcon } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { useBaseProfile } from '../hooks/useBaseProfile';
+import { useMobileMenu } from '../contexts/MobileMenuContext';
 import { signOut } from '../lib/supabase';
 
 const navItems = [
@@ -29,6 +31,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { baseProfile } = useBaseProfile();
+  const { isOpen, closeMenu } = useMobileMenu();
   const credits = profile?.credits || 0;
 
   // Get profile photo URL
@@ -56,11 +59,23 @@ export default function Sidebar() {
     return '?';
   };
 
+  // Handle nav item click - close menu on mobile
+  const handleNavClick = () => {
+    closeMenu();
+  };
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-100 flex flex-col z-40">
+    <aside
+      className={`
+        fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-100 flex flex-col z-40
+        transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:translate-x-0
+      `}
+    >
       {/* Logo */}
-      <div className="h-[73px] px-6 flex items-center border-b border-slate-100">
-        <NavLink to="/dashboard" className="flex items-center gap-3 group">
+      <div className="h-[73px] px-6 flex items-center border-b border-slate-100 justify-between">
+        <NavLink to="/dashboard" className="flex items-center gap-3 group" onClick={handleNavClick}>
           <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
             <LogoIcon className="w-5 h-5 text-white" />
           </div>
@@ -69,6 +84,15 @@ export default function Sidebar() {
             <p className="text-xs text-slate-400">Smart job applications</p>
           </div>
         </NavLink>
+
+        {/* Close button - only visible on mobile */}
+        <button
+          onClick={closeMenu}
+          className="md:hidden p-2 text-slate-400 hover:text-charcoal hover:bg-slate-100 rounded-lg transition-colors"
+          aria-label="Close menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -83,6 +107,7 @@ export default function Sidebar() {
             <NavLink
               to={item.to}
               end={item.to === '/'}
+              onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                   isActive
@@ -102,6 +127,7 @@ export default function Sidebar() {
       <div className="px-4 mb-2">
         <NavLink
           to="/dashboard/topup"
+          onClick={handleNavClick}
           className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-teal-50 to-teal-100 text-teal-700 rounded-lg hover:from-teal-100 hover:to-teal-200 transition-all"
         >
           <div className="flex items-center gap-2">
@@ -118,6 +144,7 @@ export default function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
+            onClick={handleNavClick}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 isActive
@@ -142,7 +169,7 @@ export default function Sidebar() {
 
       {/* User Profile */}
       <div className="p-4 border-t border-slate-100">
-        <NavLink to="/dashboard/settings" className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
+        <NavLink to="/dashboard/settings" onClick={handleNavClick} className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center overflow-hidden">
             {photoUrl ? (
               <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />

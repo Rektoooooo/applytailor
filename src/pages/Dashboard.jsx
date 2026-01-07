@@ -89,7 +89,7 @@ export default function Dashboard() {
       />
 
       <motion.div
-        className="p-8"
+        className="p-4 md:p-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -192,7 +192,7 @@ export default function Dashboard() {
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-100 overflow-hidden">
             {appsLoading ? (
-              <div className="p-8 text-center">
+              <div className="p-6 md:p-8 text-center">
                 <Loader2 className="w-8 h-8 text-teal-500 mx-auto mb-3 animate-spin" />
                 <p className="text-slate-500">Loading applications...</p>
               </div>
@@ -237,7 +237,7 @@ export default function Dashboard() {
                 </motion.div>
               ))
             ) : searchQuery ? (
-              <div className="p-8 text-center">
+              <div className="p-6 md:p-8 text-center">
                 <SearchX className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">No applications found</p>
                 <p className="text-sm text-slate-400 mt-1">
@@ -245,7 +245,7 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="p-8 text-center">
+              <div className="p-6 md:p-8 text-center">
                 <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">No applications yet</p>
                 <p className="text-sm text-slate-400 mt-1">

@@ -89,7 +89,7 @@ export default function AuthCallback() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="card p-8 text-center max-w-sm w-full"
+        className="card p-6 md:p-8 text-center max-w-sm w-full"
       >
         {status === 'loading' && (
           <>

@@ -1,21 +1,27 @@
+import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LogoIcon } from './Logo';
 
 export default function PublicLayout() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-cream">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-cream/80 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl flex items-center justify-center shadow-md">
               <LogoIcon className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-charcoal">ApplyTailor</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link to="/pricing" className="btn-ghost text-sm hidden sm:flex">
+
+          {/* Desktop Navigation */}
+          <div className="hidden sm:flex items-center gap-4">
+            <Link to="/pricing" className="btn-ghost text-sm">
               Pricing
             </Link>
             <Link to="/login" className="btn-ghost text-sm">
@@ -26,7 +32,53 @@ export default function PublicLayout() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2 text-slate-500 hover:text-charcoal hover:bg-warm-gray rounded-lg transition-all"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="sm:hidden bg-white border-t border-slate-100 overflow-hidden"
+            >
+              <div className="px-4 py-4 space-y-2">
+                <Link
+                  to="/pricing"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-3 text-slate-600 hover:bg-warm-gray hover:text-charcoal rounded-lg transition-colors"
+                >
+                  Pricing
+                </Link>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-3 text-slate-600 hover:bg-warm-gray hover:text-charcoal rounded-lg transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-3 bg-teal-500 text-white text-center font-medium rounded-lg hover:bg-teal-600 transition-colors"
+                >
+                  Get Started
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Content */}
@@ -35,7 +87,7 @@ export default function PublicLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-slate-100">
+      <footer className="py-8 px-4 md:px-6 border-t border-slate-100">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 bg-gradient-to-br from-teal-500 to-teal-700 rounded-lg flex items-center justify-center">

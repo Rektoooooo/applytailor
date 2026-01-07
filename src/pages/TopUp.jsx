@@ -76,7 +76,7 @@ export default function TopUp() {
         subtitle="Purchase credits to generate more tailored CVs"
       />
 
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           {/* Back Button & Current Balance */}
           <motion.div

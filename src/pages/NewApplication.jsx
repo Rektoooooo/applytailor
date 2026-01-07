@@ -216,7 +216,7 @@ export default function NewApplication() {
         subtitle="Create a tailored application in 3 simple steps"
       />
 
-      <div className="p-8 max-w-4xl mx-auto">
+      <div className="p-4 md:p-8 max-w-4xl mx-auto">
         {/* Progress Steps */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -225,7 +225,7 @@ export default function NewApplication() {
         >
           <div className="flex items-center justify-between relative">
             {/* Progress Line */}
-            <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200">
+            <div className="absolute top-4 md:top-5 left-0 right-0 h-0.5 bg-slate-200">
               <motion.div
                 className="h-full bg-teal-500"
                 initial={{ width: '0%' }}
@@ -240,7 +240,7 @@ export default function NewApplication() {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm z-10 transition-all duration-300 ${
+                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs md:text-sm z-10 transition-all duration-300 ${
                     currentStep > step.id
                       ? 'bg-teal-500 text-white'
                       : currentStep === step.id
@@ -327,7 +327,7 @@ export default function NewApplication() {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl text-center"
+                className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full mx-4 shadow-2xl text-center"
               >
                 {/* Animated Icon */}
                 <div className="relative w-20 h-20 mx-auto mb-6">
