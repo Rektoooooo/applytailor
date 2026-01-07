@@ -3,7 +3,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { callClaude, parseJsonResponse } from '../_shared/claude.ts';
-import { MAIN_GENERATION_PROMPT, buildGenerationPrompt } from '../_shared/prompts.ts';
+import { MAIN_GENERATION_PROMPT, CV_ONLY_PROMPT, COVER_LETTER_ONLY_PROMPT, buildGenerationPrompt } from '../_shared/prompts.ts';
 import {
   corsHeaders,
   verifyAuth,
@@ -21,6 +21,7 @@ interface GenerationRequest {
   job_description: string;
   company_name?: string;
   job_title?: string;
+  output_type?: 'cv' | 'cover' | 'full'; // What to generate
   profile: {
     personal_info?: { name?: string; title?: string };
     professional_summary?: string;
@@ -106,13 +107,45 @@ serve(async (req) => {
     return errorResponse('Profile must include work experience or skills');
   }
 
+  // Determine output type (default to 'full')
+  const outputType = body.output_type || 'full';
+
+  // Determine credit cost based on output type
+  let creditType: 'generation' | 'generation_cv' | 'generation_cover' = 'generation';
+  if (outputType === 'cv') {
+    creditType = 'generation_cv';
+  } else if (outputType === 'cover') {
+    creditType = 'generation_cover';
+  }
+
   // Check and deduct credits
-  const creditResult = await checkAndDeductCredits(userId, 'generation');
+  const creditResult = await checkAndDeductCredits(userId, creditType);
   if (!creditResult.success) {
     return errorResponse(creditResult.error, 402);
   }
 
   try {
+
+    // Select the appropriate prompt based on output type
+    let systemPrompt: string;
+    let maxTokens: number;
+
+    switch (outputType) {
+      case 'cv':
+        systemPrompt = CV_ONLY_PROMPT;
+        maxTokens = 1500; // Less tokens needed for CV only
+        break;
+      case 'cover':
+        systemPrompt = COVER_LETTER_ONLY_PROMPT;
+        maxTokens = 1000; // Less tokens needed for cover letter only
+        break;
+      case 'full':
+      default:
+        systemPrompt = MAIN_GENERATION_PROMPT;
+        maxTokens = 2048;
+        break;
+    }
+
     // Build the user prompt
     const userPrompt = buildGenerationPrompt(
       jobDescription,
@@ -123,14 +156,14 @@ serve(async (req) => {
 
     // Call Claude
     const claudeResult = await callClaude(
-      MAIN_GENERATION_PROMPT,
+      systemPrompt,
       [{ role: 'user', content: userPrompt }],
-      2048
+      maxTokens
     );
 
     if (!claudeResult.success) {
       // Refund credits on API failure
-      await refundCredits(userId, 'generation');
+      await refundCredits(userId, creditType);
       return errorResponse('AI generation failed. Please try again.', 503);
     }
 
@@ -140,20 +173,36 @@ serve(async (req) => {
 
     if (!parseResult.success) {
       // Refund credits on parse failure
-      await refundCredits(userId, 'generation');
+      await refundCredits(userId, creditType);
       console.error('Failed to parse Claude response:', responseText.slice(0, 500));
       return errorResponse('AI response was invalid. Please try again.', 503);
     }
 
-    // Validate the response structure
+    // Validate the response structure based on output type
     const generated = parseResult.data;
-    if (
-      !generated.tailored_bullets ||
-      !Array.isArray(generated.tailored_bullets) ||
-      !generated.cover_letter ||
-      !generated.keyword_analysis
-    ) {
-      await refundCredits(userId, 'generation');
+    let isValid = true;
+
+    if (outputType === 'cv' || outputType === 'full') {
+      // CV-related fields required
+      if (!generated.tailored_bullets || !Array.isArray(generated.tailored_bullets)) {
+        isValid = false;
+      }
+    }
+
+    if (outputType === 'cover' || outputType === 'full') {
+      // Cover letter required
+      if (!generated.cover_letter) {
+        isValid = false;
+      }
+    }
+
+    // Keyword analysis is required for all output types
+    if (!generated.keyword_analysis) {
+      isValid = false;
+    }
+
+    if (!isValid) {
+      await refundCredits(userId, creditType);
       return errorResponse('AI response was incomplete. Please try again.', 503);
     }
 
@@ -172,7 +221,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Generation error:', error);
     // Refund credits on any error
-    await refundCredits(userId, 'generation');
+    await refundCredits(userId, creditType);
     return errorResponse('Generation failed unexpectedly. Please try again.', 500);
   }
 });

@@ -101,6 +101,7 @@ export default function NewApplication() {
         companyName: fallbackCompany,
         jobTitle: fallbackRole,
         profile: baseProfile,
+        outputType: outputChoice,
       });
 
       // Use AI-extracted company/role if available (more accurate)
@@ -108,14 +109,17 @@ export default function NewApplication() {
       const role = aiContent.job_title || fallbackRole;
 
       // 4. Transform AI response to match database schema
-      const tailoredBullets = (aiContent.tailored_bullets || []).map((bullet, index) => ({
-        id: crypto.randomUUID(),
-        before: bullet.original,
-        after: bullet.tailored,
-        text: bullet.tailored,
-        keywords_matched: bullet.keywords_matched || [],
-        accepted: null,
-      }));
+      // Handle partial responses based on output type
+      const tailoredBullets = outputChoice !== 'cover'
+        ? (aiContent.tailored_bullets || []).map((bullet, index) => ({
+            id: crypto.randomUUID(),
+            before: bullet.original,
+            after: bullet.tailored,
+            text: bullet.tailored,
+            keywords_matched: bullet.keywords_matched || [],
+            accepted: null,
+          }))
+        : [];
 
       // Build keyword frequency map from all matched keywords in bullets
       const keywordCounts = {};
@@ -162,16 +166,28 @@ export default function NewApplication() {
       };
 
       // 5. Update application with AI-generated content
-      const { error: updateError } = await updateApplication(app.id, {
+      // Only include fields that were generated based on output type
+      const updateData = {
         company, // Use AI-extracted company
         role, // Use AI-extracted role
-        tailored_bullets: tailoredBullets,
-        cover_letter: aiContent.cover_letter,
-        professional_summary: aiContent.professional_summary,
         keyword_analysis: keywordAnalysis,
         match_score: aiContent.match_score,
         status: 'tailored',
-      });
+        output_type: outputChoice, // Store what was generated
+      };
+
+      // Add CV-related fields if generated
+      if (outputChoice !== 'cover') {
+        updateData.tailored_bullets = tailoredBullets;
+        updateData.professional_summary = aiContent.professional_summary;
+      }
+
+      // Add cover letter if generated
+      if (outputChoice !== 'cv') {
+        updateData.cover_letter = aiContent.cover_letter;
+      }
+
+      const { error: updateError } = await updateApplication(app.id, updateData);
 
       if (updateError) {
         throw new Error(updateError);
@@ -664,6 +680,7 @@ function StepTwo({ outputChoice, setOutputChoice }) {
       title: 'CV Only',
       description: 'Tailored bullet points for your resume',
       time: '~30 seconds',
+      credits: 0.75,
     },
     {
       id: 'cover',
@@ -671,6 +688,7 @@ function StepTwo({ outputChoice, setOutputChoice }) {
       title: 'Cover Letter Only',
       description: 'Professional, non-generic cover letter',
       time: '~20 seconds',
+      credits: 0.25,
     },
     {
       id: 'full',
@@ -678,6 +696,7 @@ function StepTwo({ outputChoice, setOutputChoice }) {
       title: 'Full Package',
       description: 'CV bullets + cover letter + keyword analysis',
       time: '~60 seconds',
+      credits: 1.0,
       recommended: true,
     },
   ];
@@ -729,7 +748,10 @@ function StepTwo({ outputChoice, setOutputChoice }) {
                 <div className="flex-1">
                   <h3 className="font-semibold text-charcoal">{option.title}</h3>
                   <p className="text-sm text-slate-500 mt-1">{option.description}</p>
-                  <p className="text-xs text-slate-400 mt-2">{option.time}</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-xs text-slate-400">{option.time}</span>
+                    <span className="text-xs font-medium text-teal-600">{option.credits} credit{option.credits !== 1 ? 's' : ''}</span>
+                  </div>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1 ${

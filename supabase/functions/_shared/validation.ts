@@ -16,7 +16,9 @@ const RATE_LIMITS = {
 
 // Credit costs
 export const CREDIT_COSTS = {
-  generation: 1.0,
+  generation: 1.0,         // Full package (CV + Cover Letter)
+  generation_cv: 0.75,     // CV only
+  generation_cover: 0.25,  // Cover letter only
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
   refine_bullet: 0.5,  // After free tier

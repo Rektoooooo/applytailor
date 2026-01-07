@@ -53,18 +53,22 @@ async function callEdgeFunction(functionName, body) {
 /**
  * Generate tailored CV content, cover letter, and keyword analysis
  * Cost: 1 credit
+ *
+ * @param outputType - 'cv' | 'cover' | 'full' (default: 'full')
  */
 export async function generateContent({
   jobDescription,
   companyName,
   jobTitle,
   profile,
+  outputType = 'full',
 }) {
   return callEdgeFunction('generate-content', {
     job_description: jobDescription,
     company_name: companyName,
     job_title: jobTitle,
     profile,
+    output_type: outputType,
   });
 }
 
@@ -112,7 +116,9 @@ export async function refineCoverLetter({
 
 // Credit costs for display purposes
 export const CREDIT_COSTS = {
-  generation: 1.0,
+  generation: 1.0,         // Full package
+  generation_cv: 0.75,     // CV only
+  generation_cover: 0.25,  // Cover letter only
   regenerate_bullets: 0.5,
   regenerate_cover: 0.5,
   refine_bullet: 0.5,  // After free tier
