@@ -14,6 +14,7 @@
     "@stripe/stripe-js": "^8.6.0",
     "@supabase/supabase-js": "^2.89.0",
     "@tailwindcss/postcss": "^4.1.18",
+    "@vercel/analytics": "^1.6.1",
     "dom-to-image-more": "^3.7.2",
     "framer-motion": "^12.24.0",
     "html2canvas": "^1.4.1",

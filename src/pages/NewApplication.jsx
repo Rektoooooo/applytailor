@@ -514,9 +514,6 @@ function StepOne({ jobInput, setJobInput, inputMethod, setInputMethod, canUseUrl
             >
               <method.icon className="w-4 h-4" />
               {method.label}
-              {method.pro && canUseUrlParsing && (
-                <span className="px-1.5 py-0.5 bg-teal-500 text-white text-xs rounded">Pro</span>
-              )}
             </button>
           ))}
         </div>
