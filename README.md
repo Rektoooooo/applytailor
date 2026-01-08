@@ -96,7 +96,15 @@ Keep all your applications organized. Track status from draft to offer accepted.
 ## Screenshots
 
 <p align="center">
-  <img src="public/screenshot-dashboard.png" alt="Dashboard" width="800" />
+  <img src="screenshots/landing.png" alt="Landing Page" width="800" />
+  <br />
+  <em>Landing — AI-powered CV tailoring that helps you land more interviews</em>
+</p>
+
+<br />
+
+<p align="center">
+  <img src="screenshots/dashboard.png" alt="Dashboard" width="800" />
   <br />
   <em>Dashboard — Track all your applications with stats and quick actions</em>
 </p>
@@ -104,15 +112,7 @@ Keep all your applications organized. Track status from draft to offer accepted.
 <br />
 
 <p align="center">
-  <img src="public/screenshot-results.png" alt="Application Results" width="800" />
-  <br />
-  <em>Results — Tailored CV bullets, keyword coverage, and requirement matching</em>
-</p>
-
-<br />
-
-<p align="center">
-  <img src="public/screenshot-smart-reply.png" alt="Smart Reply" width="800" />
+  <img src="screenshots/smart-reply.png" alt="Smart Reply" width="800" />
   <br />
   <em>Smart Reply — Professional responses to recruiter emails in seconds</em>
 </p>
