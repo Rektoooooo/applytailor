@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
-import { supabase, signOut, updatePassword, getPurchaseHistory } from '../lib/supabase';
+import { supabase, signOut, updatePassword, verifyCurrentPassword, getPurchaseHistory } from '../lib/supabase';
 
 const tabs = [
   { id: 'account', label: 'Account', icon: User },
@@ -357,6 +357,7 @@ function CreditsTab() {
 
 function SecurityTab() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -364,9 +365,27 @@ function SecurityTab() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  // Check if user signed in with OAuth (Google, etc.) - they might not have a password
+  const isOAuthUser = user?.app_metadata?.provider !== 'email';
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     setError('');
+
+    // For non-OAuth users, verify current password first
+    if (!isOAuthUser) {
+      if (!currentPassword) {
+        setError('Please enter your current password');
+        return;
+      }
+
+      const { success: isValid, error: verifyError } = await verifyCurrentPassword(user.email, currentPassword);
+      if (!isValid) {
+        setError('Current password is incorrect');
+        setLoading(false);
+        return;
+      }
+    }
 
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
@@ -408,7 +427,14 @@ function SecurityTab() {
     >
       {/* Change Password */}
       <div className="card p-6">
-        <h2 className="text-lg font-semibold text-charcoal mb-6">Change Password</h2>
+        <h2 className="text-lg font-semibold text-charcoal mb-2">
+          {isOAuthUser ? 'Set Password' : 'Change Password'}
+        </h2>
+        {isOAuthUser && (
+          <p className="text-sm text-slate-500 mb-6">
+            You signed in with Google. Set a password to also sign in with email.
+          </p>
+        )}
 
         {error && (
           <div className="p-3 bg-red-50 border border-red-100 rounded-lg mb-4 flex items-center gap-2">
@@ -425,6 +451,21 @@ function SecurityTab() {
         )}
 
         <form onSubmit={handleChangePassword} className="space-y-4">
+          {/* Current password - only for email users */}
+          {!isOAuthUser && (
+            <div>
+              <label className="label">Current Password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                className="input-field"
+                required
+              />
+            </div>
+          )}
+
           <div>
             <label className="label">New Password</label>
             <input
@@ -450,7 +491,7 @@ function SecurityTab() {
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Update Password'}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isOAuthUser ? 'Set Password' : 'Update Password')}
           </button>
         </form>
       </div>
