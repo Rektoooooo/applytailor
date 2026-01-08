@@ -68,17 +68,28 @@ export async function verifyAuth(req: Request): Promise<{ userId: string } | { e
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') as string,
-      Deno.env.get('SUPABASE_ANON_KEY') as string
+      Deno.env.get('SUPABASE_ANON_KEY') as string,
+      {
+        global: {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
     );
 
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      return { error: 'Invalid token' };
+      console.error('Auth error:', error?.message || 'No user found');
+      return { error: error?.message || 'Invalid token' };
     }
 
     return { userId: user.id };
   } catch (error) {
+    console.error('Auth exception:', error);
     return { error: 'Authentication failed' };
   }
 }

@@ -15,6 +15,7 @@ import {
   Gift,
   MessageCircle,
   Coins,
+  PenLine,
 } from 'lucide-react';
 import Header from '../components/Header';
 import { getConversations, deleteConversation } from '../lib/supabase';
@@ -39,6 +40,7 @@ function getRelativeTime(dateString) {
 
 // Message type icons and colors
 const MESSAGE_TYPE_CONFIG = {
+  compose: { icon: PenLine, color: 'text-purple-600', bg: 'bg-purple-50', label: 'Compose' },
   interview: { icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Interview' },
   rejection: { icon: ThumbsDown, color: 'text-rose-600', bg: 'bg-rose-50', label: 'Rejection' },
   offer: { icon: Gift, color: 'text-emerald-600', bg: 'bg-emerald-50', label: 'Offer' },

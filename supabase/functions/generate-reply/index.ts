@@ -22,7 +22,40 @@ interface GenerateReplyRequest {
   user_instructions?: string;
   application_id?: string;
   conversation_id?: string;
-  message_type?: 'interview' | 'rejection' | 'follow_up' | 'offer' | 'other';
+  message_type?: 'compose' | 'interview' | 'rejection' | 'follow_up' | 'offer' | 'other';
+}
+
+interface UserProfile {
+  full_name?: string;
+  email?: string;
+}
+
+interface BaseProfile {
+  work_experience?: Array<{
+    job_title?: string;
+    company?: string;
+    start_date?: string;
+    end_date?: string;
+    description?: string;
+  }>;
+  education?: Array<{
+    degree?: string;
+    school?: string;
+    graduation_year?: string;
+    field?: string;
+  }>;
+  skills?: {
+    languages?: string[];
+    frameworks?: string[];
+    tools?: string[];
+  };
+  links?: {
+    linkedin?: string;
+    portfolio?: string;
+    github?: string;
+    website?: string;
+  };
+  achievements?: string[];
 }
 
 // Message type detection keywords
@@ -46,6 +79,44 @@ function detectMessageType(message: string): string {
 }
 
 function buildSystemPrompt(messageType: string): string {
+  // Compose mode has a completely different prompt
+  if (messageType === 'compose') {
+    return `You are writing an outreach email for a job seeker.
+
+OUTPUT FORMAT (MUST FOLLOW EXACTLY):
+First output a subject line, then "---", then the email body.
+
+Example format:
+Zájem o spolupráci - Jan Novák, Software Developer
+---
+Dobrý den,
+
+[email body here]
+
+S pozdravem,
+Jan Novák
+
+ABSOLUTE RULES:
+
+1. SUBJECT LINE: Short, professional, include sender's name and purpose. No "Subject:" prefix.
+
+2. GREETING: Start email body with proper greeting like "Dobrý den," or "Dear Hiring Team,"
+
+3. LANGUAGE: Match the user's request language exactly.
+
+4. USE ONLY REAL PROFILE DATA:
+   - If profile says "Sender's Name: Jan Novák" → use "Jan Novák"
+   - If profile says "Portfolio: mysite.com" → use exactly "mysite.com"
+   - If profile says "Key Skills: React, Python" → only mention those skills
+   - If something is NOT in the profile → DO NOT MENTION IT
+
+5. ABSOLUTELY FORBIDDEN:
+   - [BRACKETS] or [PLACEHOLDERS] of any kind
+   - Made-up URLs or skills
+   - Any preamble before the subject line
+   - "I hope this finds you well"`;
+  }
+
   const basePrompt = `You are a professional career assistant helping job seekers respond to application-related emails.
 
 IMPORTANT: Detect the language of the incoming message and respond in THE SAME LANGUAGE. If the message is in German, reply in German. If in French, reply in French. Match the language exactly.
@@ -76,11 +147,103 @@ Just output the reply text directly.`;
   return `${basePrompt}\n\nFor this ${messageType} message: ${typeSpecificGuidance[messageType as keyof typeof typeSpecificGuidance] || typeSpecificGuidance.other}`;
 }
 
+function formatProfileContext(userProfile: UserProfile | null, baseProfile: BaseProfile | null): string {
+  const parts: string[] = [];
+
+  // User's name from profiles table
+  if (userProfile?.full_name) {
+    parts.push(`Sender's Name: ${userProfile.full_name}`);
+  }
+
+  if (userProfile?.email) {
+    parts.push(`Email: ${userProfile.email}`);
+  }
+
+  // Work experience
+  if (baseProfile?.work_experience && baseProfile.work_experience.length > 0) {
+    const recentExperience = baseProfile.work_experience.slice(0, 3);
+    const expText = recentExperience.map(exp => {
+      const role = exp.job_title || 'Role';
+      const company = exp.company || 'Company';
+      const period = exp.end_date ? `${exp.start_date || ''} - ${exp.end_date}` : `${exp.start_date || ''} - Present`;
+      const desc = exp.description ? ` - ${exp.description.substring(0, 150)}` : '';
+      return `• ${role} at ${company} (${period})${desc}`;
+    }).join('\n');
+    parts.push(`Work Experience:\n${expText}`);
+  }
+
+  // Skills - flatten the object structure
+  if (baseProfile?.skills) {
+    const allSkills: string[] = [];
+    if (baseProfile.skills.languages?.length) allSkills.push(...baseProfile.skills.languages);
+    if (baseProfile.skills.frameworks?.length) allSkills.push(...baseProfile.skills.frameworks);
+    if (baseProfile.skills.tools?.length) allSkills.push(...baseProfile.skills.tools);
+    if (allSkills.length > 0) {
+      parts.push(`Key Skills: ${allSkills.slice(0, 20).join(', ')}`);
+    }
+  }
+
+  // Education
+  if (baseProfile?.education && baseProfile.education.length > 0) {
+    const edu = baseProfile.education[0];
+    const eduText = [edu.degree, edu.field, edu.school, edu.graduation_year].filter(Boolean).join(', ');
+    if (eduText) parts.push(`Education: ${eduText}`);
+  }
+
+  // Links
+  if (baseProfile?.links) {
+    if (baseProfile.links.linkedin) {
+      parts.push(`LinkedIn: ${baseProfile.links.linkedin}`);
+    }
+    if (baseProfile.links.portfolio) {
+      parts.push(`Portfolio: ${baseProfile.links.portfolio}`);
+    }
+    if (baseProfile.links.github) {
+      parts.push(`GitHub: ${baseProfile.links.github}`);
+    }
+    if (baseProfile.links.website) {
+      parts.push(`Website: ${baseProfile.links.website}`);
+    }
+  }
+
+  // Achievements
+  if (baseProfile?.achievements && baseProfile.achievements.length > 0) {
+    parts.push(`Key Achievements: ${baseProfile.achievements.slice(0, 3).join('; ')}`);
+  }
+
+  return parts.join('\n');
+}
+
 function buildUserPrompt(
   pastedMessage: string,
   userInstructions: string | undefined,
-  applicationContext: { company?: string; jobTitle?: string } | null
+  applicationContext: { company?: string; jobTitle?: string } | null,
+  messageType: string,
+  profileContext: string | null
 ): string {
+  // Compose mode - user is writing an outreach email
+  if (messageType === 'compose') {
+    let prompt = `User's request: ${pastedMessage}\n`;
+
+    if (profileContext) {
+      prompt += `\n=== SENDER'S ACTUAL PROFILE (use ONLY this data, don't invent) ===\n${profileContext}\n=== END PROFILE ===\n`;
+    } else {
+      prompt += `\n[No profile data available - keep the email generic]\n`;
+    }
+
+    if (applicationContext?.company || applicationContext?.jobTitle) {
+      prompt += `\nTarget company/role: ${applicationContext.jobTitle || ''} at ${applicationContext.company || ''}\n`;
+    }
+
+    if (userInstructions) {
+      prompt += `\nAdditional instructions: ${userInstructions}\n`;
+    }
+
+    prompt += '\nWrite the email now (start with greeting, no preamble):';
+    return prompt;
+  }
+
+  // Standard reply mode
   let prompt = `Message received:\n---\n${pastedMessage}\n---\n`;
 
   if (applicationContext?.company || applicationContext?.jobTitle) {
@@ -181,12 +344,107 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Detect or use provided message type
-    const messageType = body.message_type || detectMessageType(pastedMessage);
+    // Check if this is a follow-up to an existing conversation
+    let existingConversation: { message_type: string; application_id: string | null } | null = null;
+    let previousEmail: string | null = null;
+
+    if (body.conversation_id) {
+      // Get the existing conversation's message type
+      const { data: conv } = await supabase
+        .from('conversations')
+        .select('message_type, application_id')
+        .eq('id', body.conversation_id)
+        .eq('user_id', userId)
+        .single();
+
+      if (conv) {
+        existingConversation = conv;
+
+        // For compose rewrites, get the last generated email
+        if (conv.message_type === 'compose') {
+          const { data: lastMessage } = await supabase
+            .from('conversation_messages')
+            .select('content')
+            .eq('conversation_id', body.conversation_id)
+            .eq('role', 'assistant')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (lastMessage) {
+            previousEmail = lastMessage.content;
+          }
+        }
+      }
+    }
+
+    // Detect or use provided message type (use existing conversation's type if available)
+    const messageType = existingConversation?.message_type || body.message_type || detectMessageType(pastedMessage);
+    const isComposeRewrite = messageType === 'compose' && previousEmail;
+
+    // Fetch user profile for compose mode
+    let profileContext: string | null = null;
+    if (messageType === 'compose') {
+      // Fetch from profiles table (name, email)
+      const { data: userProfile, error: userProfileError } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', userId)
+        .single();
+
+      // Fetch from base_profiles table (experience, skills, links)
+      const { data: baseProfile, error: baseProfileError } = await supabase
+        .from('base_profiles')
+        .select('work_experience, education, skills, links, achievements')
+        .eq('user_id', userId)
+        .single();
+
+      console.log('Profile fetch results:', {
+        userProfile: userProfile ? JSON.stringify(userProfile) : 'not found',
+        userProfileError: userProfileError?.message,
+        baseProfile: baseProfile ? 'found' : 'not found',
+        baseProfileError: baseProfileError?.message,
+        baseProfileLinks: baseProfile?.links ? JSON.stringify(baseProfile.links) : 'no links',
+        baseProfileSkills: baseProfile?.skills ? JSON.stringify(baseProfile.skills) : 'no skills',
+      });
+
+      profileContext = formatProfileContext(
+        userProfile as UserProfile | null,
+        baseProfile as BaseProfile | null
+      );
+      console.log('Formatted profile context:', profileContext);
+    }
 
     // Build prompts
-    const systemPrompt = buildSystemPrompt(messageType);
-    const userPrompt = buildUserPrompt(pastedMessage, userInstructions, applicationContext);
+    let systemPrompt: string;
+    let userPrompt: string;
+
+    if (isComposeRewrite) {
+      // Special prompt for rewriting an existing compose email
+      systemPrompt = `You are a professional career assistant helping rewrite outreach emails.
+
+CRITICAL RULES:
+1. LANGUAGE: Keep the same language as the original email unless asked to change it.
+2. NO PLACEHOLDERS: NEVER use placeholder brackets like [Your Name], [Company], etc. Use actual information.
+3. PRESERVE INTENT: Keep the core purpose of the email while applying the requested changes.
+
+Rewrite the email according to the user's instructions. Output only the rewritten email, no explanations.`;
+
+      userPrompt = `Here is the current email draft:
+
+---
+${previousEmail}
+---
+
+User's request for changes: ${pastedMessage}
+${userInstructions ? `\nAdditional instructions: ${userInstructions}` : ''}
+${profileContext ? `\n--- Sender's Profile (use if needed) ---\n${profileContext}\n---` : ''}
+
+Rewrite the email with the requested changes:`;
+    } else {
+      systemPrompt = buildSystemPrompt(messageType);
+      userPrompt = buildUserPrompt(pastedMessage, userInstructions, applicationContext, messageType, profileContext);
+    }
 
     // Call Claude
     const claudeResult = await callClaude(
@@ -211,9 +469,16 @@ Deno.serve(async (req) => {
 
     if (!conversationId) {
       // Create new conversation
-      const title = applicationContext?.company
-        ? `${messageType.charAt(0).toUpperCase() + messageType.slice(1).replace('_', ' ')} - ${applicationContext.company}`
-        : `${messageType.charAt(0).toUpperCase() + messageType.slice(1).replace('_', ' ')} Response`;
+      let title: string;
+      if (messageType === 'compose') {
+        title = applicationContext?.company
+          ? `Email to ${applicationContext.company}`
+          : 'Outreach Email';
+      } else {
+        title = applicationContext?.company
+          ? `${messageType.charAt(0).toUpperCase() + messageType.slice(1).replace('_', ' ')} - ${applicationContext.company}`
+          : `${messageType.charAt(0).toUpperCase() + messageType.slice(1).replace('_', ' ')} Response`;
+      }
 
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
@@ -256,11 +521,32 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Save the generated reply
+    // For compose mode, split subject and body
+    let subjectLine: string | null = null;
+    let emailBody = generatedReply;
+
+    if (messageType === 'compose' && generatedReply.includes('---')) {
+      const parts = generatedReply.split('---');
+      if (parts.length >= 2) {
+        subjectLine = parts[0].trim();
+        emailBody = parts.slice(1).join('---').trim();
+      }
+    }
+
+    // Save subject line as separate message for compose mode
+    if (subjectLine) {
+      await supabase.from('conversation_messages').insert({
+        conversation_id: conversationId,
+        role: 'subject',
+        content: subjectLine,
+      });
+    }
+
+    // Save the generated reply/email body
     await supabase.from('conversation_messages').insert({
       conversation_id: conversationId,
       role: 'assistant',
-      content: generatedReply,
+      content: emailBody,
       credits_used: creditResult.wasFree ? 0 : CREDIT_COSTS.smart_reply,
     });
 

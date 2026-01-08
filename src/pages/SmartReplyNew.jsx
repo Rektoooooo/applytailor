@@ -15,12 +15,14 @@ import {
   ChevronDown,
   Sparkles,
   Coins,
+  PenLine,
 } from 'lucide-react';
 import Header from '../components/Header';
 import { useApplications } from '../hooks/useApplications';
 import { generateReply, checkFreeReplies, purchaseReplyPack, CREDIT_COSTS, FREE_TIER } from '../lib/aiApi';
 
 const MESSAGE_TYPES = [
+  { value: 'compose', label: 'Compose Email', icon: PenLine, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
   { value: 'interview', label: 'Interview Invite', icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
   { value: 'rejection', label: 'Rejection', icon: ThumbsDown, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200' },
   { value: 'follow_up', label: 'Follow-up', icon: MessageCircle, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
@@ -97,12 +99,16 @@ export default function SmartReplyNew() {
 
   const handleGenerate = async () => {
     if (!pastedMessage.trim()) {
-      toast.error('Please paste a message to generate a reply');
+      toast.error(messageType === 'compose'
+        ? 'Please describe the email you want to write'
+        : 'Please paste a message to generate a reply');
       return;
     }
 
     if (pastedMessage.trim().length < 20) {
-      toast.error('Message must be at least 20 characters');
+      toast.error(messageType === 'compose'
+        ? 'Please provide more details (at least 20 characters)'
+        : 'Message must be at least 20 characters');
       return;
     }
 
@@ -141,8 +147,10 @@ export default function SmartReplyNew() {
   return (
     <div className="min-h-screen bg-[#faf9f7]">
       <Header
-        title="New Smart Reply"
-        subtitle="Generate a professional response to an email"
+        title={messageType === 'compose' ? "Compose Email" : "New Smart Reply"}
+        subtitle={messageType === 'compose'
+          ? "Write a professional outreach email using your profile"
+          : "Generate a professional response to an email"}
       />
 
       <motion.div
@@ -189,9 +197,9 @@ export default function SmartReplyNew() {
           {/* Message Type */}
           <div>
             <label className="block text-sm font-medium text-charcoal mb-2">
-              Message Type
+              What do you want to do?
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
               {MESSAGE_TYPES.map((type) => {
                 const TypeIcon = type.icon;
                 const isSelected = messageType === type.value;
@@ -213,26 +221,36 @@ export default function SmartReplyNew() {
               })}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Auto-detected if not selected
+              {messageType === 'compose' ? 'Compose a new email from scratch' : 'Auto-detected if not selected'}
             </p>
           </div>
 
-          {/* Paste Message */}
+          {/* Message Content - Different for Compose vs Reply */}
           <div>
             <label className="block text-sm font-medium text-charcoal mb-2">
-              Paste the message you received <span className="text-rose-500">*</span>
+              {messageType === 'compose'
+                ? <>Describe the email you want to write <span className="text-rose-500">*</span></>
+                : <>Paste the message you received <span className="text-rose-500">*</span></>
+              }
             </label>
             <textarea
               value={pastedMessage}
               onChange={(e) => setPastedMessage(e.target.value)}
-              placeholder="Dear [Name],
+              placeholder={messageType === 'compose'
+                ? `Who are you reaching out to and why?
 
-Thank you for your application. We would like to invite you for an interview..."
+Example:
+"I want to email Sarah Chen, Engineering Manager at Stripe. I'm interested in the Senior Developer role I saw on LinkedIn. I love their payment infrastructure work and want to introduce myself."`
+                : `Dear [Name],
+
+Thank you for your application. We would like to invite you for an interview...`}
               rows={8}
               className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
             />
             <p className="text-xs text-slate-500 mt-1">
-              {pastedMessage.length}/10,000 characters
+              {messageType === 'compose'
+                ? 'Your profile info will be used to personalize the email'
+                : `${pastedMessage.length}/10,000 characters`}
             </p>
           </div>
 
@@ -245,11 +263,13 @@ Thank you for your application. We would like to invite you for an interview..."
               type="text"
               value={userInstructions}
               onChange={(e) => setUserInstructions(e.target.value)}
-              placeholder='e.g., "Keep it brief", "Ask about remote work policy", "Sound enthusiastic"'
+              placeholder={messageType === 'compose'
+                ? 'e.g., "Keep it under 150 words", "Mention my startup experience", "Casual tone"'
+                : 'e.g., "Keep it brief", "Ask about remote work policy", "Sound enthusiastic"'}
               className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
             <p className="text-xs text-slate-500 mt-1">
-              Customize how the reply is generated
+              {messageType === 'compose' ? 'Customize tone, length, or specific points to mention' : 'Customize how the reply is generated'}
             </p>
           </div>
 
@@ -286,12 +306,12 @@ Thank you for your application. We would like to invite you for an interview..."
                 {generating ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Generating...
+                    {messageType === 'compose' ? 'Composing...' : 'Generating...'}
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
-                    Generate Reply
+                    {messageType === 'compose' ? <PenLine className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+                    {messageType === 'compose' ? 'Compose Email' : 'Generate Reply'}
                   </>
                 )}
               </button>

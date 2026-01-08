@@ -18,6 +18,7 @@ import {
   User,
   Bot,
   Sparkles,
+  PenLine,
 } from 'lucide-react';
 import Header from '../components/Header';
 import { getConversation, deleteConversation } from '../lib/supabase';
@@ -25,6 +26,7 @@ import { generateReply, checkFreeReplies, CREDIT_COSTS, FREE_TIER } from '../lib
 
 // Message type config
 const MESSAGE_TYPE_CONFIG = {
+  compose: { icon: PenLine, color: 'text-purple-600', bg: 'bg-purple-50', label: 'Compose' },
   interview: { icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Interview' },
   rejection: { icon: ThumbsDown, color: 'text-rose-600', bg: 'bg-rose-50', label: 'Rejection' },
   offer: { icon: Gift, color: 'text-emerald-600', bg: 'bg-emerald-50', label: 'Offer' },
@@ -242,14 +244,26 @@ export default function SmartReplyConversation() {
           <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
             {messages.map((message, index) => {
               const isAssistant = message.role === 'assistant';
+              const isSubject = message.role === 'subject';
               const isInstruction = message.role === 'instruction';
               const isPasted = message.role === 'pasted';
+              const isAIGenerated = isAssistant || isSubject;
 
               // Skip instruction messages in main view (show inline)
               if (isInstruction) return null;
 
               // Show date separator if needed
               const showDate = index === 0 || formatDate(message.created_at) !== formatDate(messages[index - 1]?.created_at);
+
+              // Determine label text
+              let labelText;
+              if (isSubject) {
+                labelText = 'Subject Line';
+              } else if (isAssistant) {
+                labelText = conversation.message_type === 'compose' ? 'Email Body' : 'Generated Reply';
+              } else {
+                labelText = conversation.message_type === 'compose' ? 'Your Request' : 'Received Message';
+              }
 
               return (
                 <div key={message.id}>
@@ -264,22 +278,22 @@ export default function SmartReplyConversation() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${isAssistant ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${isAIGenerated ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`max-w-[85%] ${isAssistant ? 'order-1' : ''}`}>
+                    <div className={`max-w-[85%] ${isAIGenerated ? 'order-1' : ''}`}>
                       {/* Label */}
-                      <div className={`flex items-center gap-2 mb-1 ${isAssistant ? 'justify-end' : ''}`}>
+                      <div className={`flex items-center gap-2 mb-1 ${isAIGenerated ? 'justify-end' : ''}`}>
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                          isAssistant ? 'bg-teal-100' : 'bg-slate-100'
+                          isAIGenerated ? 'bg-teal-100' : 'bg-slate-100'
                         }`}>
-                          {isAssistant ? (
+                          {isAIGenerated ? (
                             <Bot className="w-3 h-3 text-teal-600" />
                           ) : (
                             <User className="w-3 h-3 text-slate-600" />
                           )}
                         </div>
                         <span className="text-xs text-slate-500">
-                          {isAssistant ? 'Generated Reply' : 'Received Message'}
+                          {labelText}
                         </span>
                         <span className="text-xs text-slate-400">
                           {formatTime(message.created_at)}
@@ -288,16 +302,18 @@ export default function SmartReplyConversation() {
 
                       {/* Message Bubble */}
                       <div className={`relative rounded-2xl p-4 ${
-                        isAssistant
-                          ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white'
-                          : 'bg-slate-100 text-charcoal'
+                        isSubject
+                          ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white'
+                          : isAssistant
+                            ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white'
+                            : 'bg-slate-100 text-charcoal'
                       }`}>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
                           {message.content}
                         </p>
 
-                        {/* Copy Button for Assistant Messages */}
-                        {isAssistant && (
+                        {/* Copy Button for AI Generated Messages */}
+                        {isAIGenerated && (
                           <button
                             onClick={() => handleCopy(message.content, message.id)}
                             className="absolute bottom-2 right-2 p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
@@ -325,14 +341,18 @@ export default function SmartReplyConversation() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Continue Conversation */}
+          {/* Continue Conversation / Rewrite */}
           <div className="border-t border-slate-100 p-4 bg-slate-50/50">
-            <h4 className="text-sm font-medium text-charcoal mb-3">Continue Conversation</h4>
+            <h4 className="text-sm font-medium text-charcoal mb-3">
+              {conversation.message_type === 'compose' ? 'Rewrite Email' : 'Continue Conversation'}
+            </h4>
 
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Paste a follow-up message..."
+              placeholder={conversation.message_type === 'compose'
+                ? "Describe how you want to change the email..."
+                : "Paste a follow-up message..."}
               rows={3}
               className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none text-sm"
             />
@@ -341,7 +361,9 @@ export default function SmartReplyConversation() {
               type="text"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
-              placeholder="Additional instructions (optional)"
+              placeholder={conversation.message_type === 'compose'
+                ? "e.g., 'Make it shorter', 'More casual tone', 'Add my portfolio link'"
+                : "Additional instructions (optional)"}
               className="w-full mt-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
             />
 
@@ -358,12 +380,12 @@ export default function SmartReplyConversation() {
                 {generating ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Generating...
+                    {conversation.message_type === 'compose' ? 'Rewriting...' : 'Generating...'}
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
-                    Generate Follow-up
+                    <PenLine className="w-4 h-4" />
+                    {conversation.message_type === 'compose' ? 'Rewrite' : 'Generate Follow-up'}
                   </>
                 )}
               </button>
