@@ -1,0 +1,12 @@
+# ApplyTailor Robots.txt
+
+User-agent: *
+Allow: /
+
+# Block protected/private routes
+Disallow: /dashboard/
+Disallow: /smart-reply/
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://applytailor.com/sitemap.xml
